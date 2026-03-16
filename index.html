@@ -275,7 +275,7 @@ header {
 .hb-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--primary); font-weight: 400; margin-bottom: 16px; opacity: .9; }
 .hb-h1 { font-family: 'Roboto', system-ui, sans-serif; font-weight: 700; font-size: clamp(26px,3.5vw,44px); line-height: 1.1; letter-spacing: -.02em; margin-bottom: 14px; }
 .hb-h1 em { font-style: normal; color: var(--primary); font-weight: 800; }
-.hb-sub { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 500px; margin: 0 auto 30px; }
+.hb-sub { font-size: clamp(17px, 2.2vw, 26px); color: var(--text); font-weight: 400; line-height: 1.4; max-width: 640px; margin: 0 auto 30px; letter-spacing: -.01em; }
 .hb-sub em { font-style: italic; color: var(--text); }
 .hb-stats { display: flex; justify-content: center; gap: 44px; margin-bottom: 36px; }
 .hb-stat-n { font-size: 20px; font-weight: 600; color: var(--plight); letter-spacing: -.02em; }
@@ -505,8 +505,8 @@ html, body { overflow-x: hidden; }
 <div id="chatWrap" role="main">
   <div class="hero-band" aria-hidden="false">
     <div class="hb-eyebrow"></div>
-<h1 class="hb-h1">Hey, I'm Meghan.</h1>
-    <p class="hb-sub">Product Designer untangling complex B2B SaaS flows into the obvious.</p>
+    <p class="hb-sub">Product Designer untangling complex B2B SaaS flows into the obvious<span style="color:var(--primary)">.</span></p>
+    <p style="font-size:13px;color:var(--primary);font-weight:500;letter-spacing:.06em;margin-bottom:30px;">4+ Years of Experience &nbsp;·&nbsp; New York, New York</p>
     <div class="hb-divider"><span class="hb-divider-label">Chat with Meghan</span></div>
   </div>
   <div class="msgs" id="msgs" role="log" aria-live="polite" aria-label="Conversation with Meghan's Agent"></div>
@@ -797,6 +797,7 @@ function tplContact() {
     <div class="cc-links">
       <a href="mailto:meghan.kulkarni@gmail.com" class="cc-link">✉&ensp;meghan.kulkarni@gmail.com</a>
       <a href="tel:+19174472584" class="cc-link">✆&ensp;+1 917 447 2584</a>
+      <a href="http://meghanportfolio.com" target="_blank" class="cc-link">⬡&ensp;meghanportfolio.com</a>
     </div>
   </div>`;
 }
@@ -1032,14 +1033,14 @@ const R = {
       [0, () => showTyping()],
       [950, () => {
         hideTyping();
-        addBubble(`Hey, I'm Meghan. This is my portfolio. Ask me anything, or explore my two case studies below:`, 'agent');
+        addBubble(`Hey, I'm Meghan 👋. This is my portfolio. Ask me anything, or explore my two case studies below:`, 'agent');
       }],
       [1400, () => {
         addCard(tplCS2());
         setTimeout(() => animateDots('vd1'), 200);
         addCard(tplCS1());
       }],
-      [2300, () => setChips(['Cassini', 'Internal Knowledge Engine', 'About Me', 'My process', 'Contact'])],
+      [2300, () => setChips(['Cassini', 'Internal Knowledge Engine', 'About Me', 'Contact'])],
     ]);
   },
 
@@ -1102,8 +1103,8 @@ const R = {
       [500, () => {
         hideTyping();
 
-        // 01 · Internal Knowledge Engine
-        addCard(tplSectionTag('01 · Internal Knowledge Engine'));
+        // 01 · Name of Study
+        addCard(tplSectionTag('01 · Name of Study'));
         addCard(tplCS1());
         addCard(tplIKEPrototype());
         addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="ike.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div></div>`);
@@ -1176,8 +1177,8 @@ addCard(tplIKEModules());
       [500, () => {
         hideTyping();
 
-        // 01 · Cassini
-        addCard(tplSectionTag('01 · Cassini'));
+        // 01 · Name of Study
+        addCard(tplSectionTag('01 · Name of Study'));
         addCard(tplCS2());
         addCard(tplCassiniImages());
         addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="cassini.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div></div>`);
