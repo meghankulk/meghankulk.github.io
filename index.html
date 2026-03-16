@@ -494,8 +494,8 @@ html, body { overflow-x: hidden; }
     Meghan's Agent is active
   </div>
   <nav class="h-nav" aria-label="Site links">
-    <button class="h-cs-btn" onclick="openCS(1)" aria-label="Open Internal Knowledge Engine case study">Internal Knowledge Engine</button>
     <button class="h-cs-btn" onclick="openCS(2)" aria-label="Open Cassini case study">Cassini</button>
+    <button class="h-cs-btn" onclick="openCS(1)" aria-label="Open Internal Knowledge Engine case study">Internal Knowledge Engine</button>
     <button class="h-nav-btn" onclick="openAbout()" aria-label="About Meghan">About Me</button>
     <button class="h-nav-btn" onclick="openResume()" aria-label="View resume">Resume</button>
     <a href="mailto:meghan.kulkarni@gmail.com" class="h-cta" target="_blank" rel="noopener">Email Meghan</a>
@@ -1036,11 +1036,11 @@ const R = {
         addBubble(`Hey, I'm Meghan. This is my portfolio. Ask me anything, or explore my two case studies below:`, 'agent');
       }],
       [1400, () => {
-        addCard(tplCS1());
-        setTimeout(() => animateDots('vd1'), 200);
         addCard(tplCS2());
+        setTimeout(() => animateDots('vd1'), 200);
+        addCard(tplCS1());
       }],
-      [2300, () => setChips(['Internal Knowledge Engine', 'Cassini', 'About Me', 'My process', 'Contact'])],
+      [2300, () => setChips(['Cassini', 'Internal Knowledge Engine', 'About Me', 'My process', 'Contact'])],
     ]);
   },
 
@@ -1084,11 +1084,11 @@ const R = {
         addBubble(`Two case studies, both at Accrete AI, both grounded in research:`, 'agent');
       }],
       [1300, () => {
-        addCard(tplCS1());
+        addCard(tplCS2());
         setTimeout(() => animateDots('vd1'), 200);
       }],
-      [2000, () => addCard(tplCS2())],
-      [2500, () => setChips(['Internal Knowledge Engine', 'Cassini', "What's your process?"])],
+      [2000, () => addCard(tplCS1())],
+      [2500, () => setChips(['Cassini', 'Internal Knowledge Engine', "What's your process?"])],
     ]);
   },
 
