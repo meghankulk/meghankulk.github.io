@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meghan Kulkarni · Portfolio Agent</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Syne:wght@400;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #030e14;
+  --glass:   rgba(5,18,28,.7);
+  --gb:      rgba(100,200,220,.1);
+  --primary: #0ea5b5;
+  --plight:  #5cc8d5;
+  --teal:    #0ea5b5;
+  --gold:    #5cc8d5;
+  --text:    #c8dde6;
+  --muted:   #4a6878;
+}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; overflow-x: hidden; }
+body {
+  background: var(--bg);
+  background-image: radial-gradient(ellipse 70% 40% at 30% 0%, rgba(14,165,181,.06), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 80% 100%, rgba(0,140,160,.04), transparent 55%);
+  color: var(--text);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ── UNDERWATER AMBIENCE ── */
+.uw{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+/* caustic light shimmer */
+.uw::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(ellipse 60% 30% at 30% 5%, rgba(14,165,181,.07), transparent 60%),
+  radial-gradient(ellipse 40% 20% at 70% 10%, rgba(92,200,213,.05), transparent 55%);
+  animation:caustic 18s ease-in-out infinite alternate}
+.uw::after{content:'';position:absolute;inset:0;background:
+  radial-gradient(ellipse 50% 25% at 55% 8%, rgba(14,165,181,.05), transparent 55%);
+  animation:caustic 24s ease-in-out infinite alternate-reverse}
+@keyframes caustic{0%{opacity:.6;transform:translateX(-15px) scaleX(.95)}100%{opacity:1;transform:translateX(15px) scaleX(1.05)}}
+.b{position:absolute;border-radius:50%;background:rgba(100,200,220,.04);border:1px solid rgba(100,200,220,.07);animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:.5}100%{transform:translateY(-110vh) translateX(12px);opacity:0}}
+
+/* ── HEADER ── */
+header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(3,10,18,.9);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(100,200,220,.1);
+  box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 4px 24px rgba(0,0,0,.3);
+}
+.h-logo { font-family: 'Roboto', system-ui, sans-serif; font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.h-logo span { color: var(--primary); text-shadow: 0 0 12px rgba(14,165,181,.4); }
+.h-status { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+.h-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: pulse 2s infinite; box-shadow: 0 0 6px var(--teal); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+.h-nav { display: flex; gap: 16px; align-items: center; }
+.h-nav a { font-size: 13px; color: var(--muted); transition: color .2s; }
+.h-nav a:hover { color: var(--text); }
+.h-nav .h-cta { padding: 6px 16px; border-radius: 100px; border: 1px solid var(--gb); font-size: 12px; transition: border-color .2s; }
+.h-nav .h-cta:hover { border-color: var(--primary); color: var(--plight); }
+.h-cs-btn { background: rgba(100,200,220,.1); border: 1px solid rgba(100,200,220,.25); color: var(--plight); font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 100px; cursor: pointer; font-family: inherit; transition: all .2s; }
+.h-cs-btn:hover { background: rgba(100,200,220,.2); border-color: var(--primary); }
+.h-nav-btn { background: none; border: none; color: var(--muted); font-size: 13px; font-weight: 400; padding: 0; cursor: pointer; font-family: inherit; transition: color .2s; }
+.h-nav-btn:hover { color: var(--text); }
+
+/* ── CHAT AREA ── */
+#chatWrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 76px 24px 210px;
+  position: relative; z-index: 1;
+}
+#chatWrap::-webkit-scrollbar { width: 3px; }
+#chatWrap::-webkit-scrollbar-thumb { background: rgba(100,200,220,.2); border-radius: 2px; }
+
+.msgs { max-width: 950px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+/* ── MESSAGES ── */
+.msg { display: flex; gap: 10px; }
+.msg.user { flex-direction: row-reverse; }
+
+.msg-av {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, rgba(100,200,220,.35), rgba(5,60,80,.8));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; flex-shrink: 0; margin-top: 2px;
+  box-shadow: 0 0 14px rgba(14,165,181,.25), inset 0 1px 0 rgba(255,255,255,.15);
+  border: 1px solid rgba(100,200,220,.25);
+  color: #aee8f0; overflow: hidden;
+}
+.msg-av img { width: 100%; height: 100%; object-fit: cover; object-position: center top; border-radius: 50%; display: block; image-rendering: -webkit-optimize-contrast; }
+.msg-av-user { background: rgba(14,165,181,.15); border-color: rgba(14,165,181,.3); color: #5cc8d5; }
+.bub {
+  padding: 11px 15px;
+  border-radius: 14px;
+  max-width: 950px;
+  line-height: 1.68;
+  font-size: 13.5px;
+}
+.msg.agent .bub {
+  background: linear-gradient(160deg, rgba(5,22,35,.82), rgba(3,14,22,.88));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(100,200,220,.12);
+  border-top-color: rgba(100,200,220,.2);
+  border-radius: 4px 16px 16px 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25), inset 0 1px 0 rgba(100,200,220,.08);
+}
+.msg.user .bub {
+  background: linear-gradient(135deg, rgba(14,165,181,.9), rgba(5,90,108,.95));
+  color: #e0f7fa;
+  border-radius: 16px 4px 16px 16px;
+  box-shadow: 0 4px 16px rgba(14,165,181,.2);
+  border: 1px solid rgba(100,200,220,.2);
+}
+.msg.agent .bub strong { color: #7dd8e2; font-weight: 600; }
+.msg.agent .bub em { color: #7dd8e2; font-style: italic; }
+.msg.agent .bub strong { color: var(--plight); font-weight: 600; }
+.msg.agent .bub em { color: var(--plight); font-style: italic; }
+
+/* typing */
+.typing { display: flex; gap: 4px; padding: 2px 0; }
+.typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce .8s infinite; }
+.typing span:nth-child(2){animation-delay:.15s} .typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+
+/* ── RICH CARDS ── */
+.msg.agent .msg-card-wrap { max-width: 950px; }
+
+.msg-card {
+  background: rgba(10,10,18,.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(100,200,220,.15);
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05);
+  transition: border-color .25s, transform .25s, box-shadow .25s;
+}
+.msg-card:hover { border-color: rgba(100,200,220,.3); transform: translateY(-2px); box-shadow: 0 16px 48px rgba(14,165,181,.1), 0 8px 32px rgba(0,0,0,.4); }
+.mc-vis { height: 130px; position: relative; overflow: hidden; flex-shrink: 0; }
+.mc-vis-1 { background: linear-gradient(135deg,#020c14 0%,#051c28 50%,#041823 100%); }
+.mc-vis-2 { background: linear-gradient(135deg,#020c14 0%,#051c28 50%,#041823 100%); }
+.mc-vis-1::after { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 80% 80% at 60% 50%,rgba(14,165,181,.1),transparent 65%); }
+.mc-vis-2::after { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 80% 80% at 40% 50%,rgba(14,165,181,.1),transparent 65%); }
+.mc-vis-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(14,165,181,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(14,165,181,.06) 1px,transparent 1px);
+  background-size: 22px 22px;
+  z-index: 1;
+}
+.mc-body { padding: 14px; }
+.mc-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.mc-tag { padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 500; border: 1px solid rgba(100,200,220,.18); color: var(--muted); }
+.mc-title { font-family: 'Roboto', system-ui, sans-serif; font-size: 15px; font-weight: 700; letter-spacing: -.01em; margin-bottom: 3px; }
+.mc-sub { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.mc-metrics { display: flex; gap: 14px; padding: 10px 0; border-top: 1px solid rgba(100,200,220,.1); border-bottom: 1px solid rgba(100,200,220,.1); margin-bottom: 10px; }
+.mc-mv { font-size: 16px; font-weight: 700; letter-spacing: -.015em; }
+.mc-ml { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.mc-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--plight); cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; transition: gap .2s; }
+.mc-cta:hover { gap: 10px; }
+
+/* skills */
+.skill-card {
+  background: rgba(9,18,31,.75);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--gb);
+  border-radius: 14px; padding: 16px;
+  max-width: 950px;
+}
+.sk-head { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 12px; }
+.sk-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(100,200,220,.08); font-size: 13px; }
+.sk-row:last-child { border-bottom: none; }
+.sk-bar { width: 72px; height: 3px; background: rgba(100,200,220,.15); border-radius: 2px; overflow: hidden; }
+.sk-fill { height: 100%; background: var(--primary); border-radius: 2px; }
+
+/* outcomes */
+.out-card {
+  background: rgba(9,18,31,.75);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--gb);
+  border-radius: 14px; padding: 16px;
+  max-width: 950px;
+}
+.out-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 12px; }
+.out-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.out-item { background: rgba(14,165,181,.05); border: 1px solid rgba(14,165,181,.1); border-radius: 10px; padding: 12px; }
+.out-val { font-size: 22px; font-weight: 700; letter-spacing: -.025em; }
+.out-desc { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+/* contact */
+.contact-card {
+  background: rgba(9,18,31,.75);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--gb);
+  border-radius: 14px; padding: 18px;
+  max-width: 950px;
+}
+.cc-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(100,200,220,.1); }
+.cc-av { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,var(--primary),#065a68); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; flex-shrink: 0; }
+.cc-name { font-size: 15px; font-weight: 600; }
+.cc-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.cc-links { display: flex; flex-direction: column; gap: 7px; }
+.cc-link { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 9px 12px; background: rgba(100,200,220,.07); border: 1px solid rgba(100,200,220,.14); border-radius: 8px; transition: background .2s; color: var(--text); text-decoration: none; }
+.cc-link:hover { background: rgba(100,200,220,.14); }
+
+/* ── SECTION TAG ── */
+.section-tag-row { display: flex; align-items: center; gap: 10px; max-width: 950px; margin: 4px 0 2px; }
+.section-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; background: rgba(14,165,181,.08); border: 1px solid rgba(14,165,181,.22); border-radius: 100px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .13em; text-transform: uppercase; color: var(--primary); white-space: nowrap; }
+.section-tag-line { flex: 1; height: 1px; background: rgba(100,200,220,.1); }
+
+/* ── LIST CARD ── */
+.list-card { background: linear-gradient(160deg,rgba(5,22,35,.9),rgba(3,14,22,.92)); backdrop-filter: blur(20px); border: 1px solid rgba(100,200,220,.15); border-top-color: rgba(100,200,220,.25); border-radius: 14px; padding: 16px 18px; max-width: 950px; }
+.list-card-title { font-size: 11px; font-family: 'IBM Plex Mono', monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.list-items { display: flex; flex-direction: column; gap: 8px; }
+.list-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.55; }
+.list-item::before { content: '—'; color: var(--primary); font-family: 'IBM Plex Mono', monospace; font-size: 11px; margin-top: 2px; flex-shrink: 0; }
+
+/* quote */
+.quote-card {
+  border-left: 3px solid var(--primary);
+  padding: 12px 16px;
+  background: rgba(9,18,31,.55);
+  backdrop-filter: blur(8px);
+  border-radius: 0 10px 10px 0;
+  font-style: italic; font-size: 14px; line-height: 1.7;
+  color: var(--text);
+  max-width: 950px;
+}
+.quote-attr { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: normal; }
+
+/* ── metric graph card ── */
+.metric-card {
+  background: linear-gradient(160deg, rgba(5,22,35,.9), rgba(3,14,22,.92));
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(100,200,220,.15);
+  border-top-color: rgba(100,200,220,.25);
+  border-radius: 14px; padding: 18px;
+  max-width: 950px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.3), inset 0 1px 0 rgba(100,200,220,.08);
+}
+.mc-g-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 14px; }
+.mc-g-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mc-g-row:last-child { margin-bottom: 0; }
+.mc-g-name { font-size: 12px; color: var(--text); width: 160px; flex-shrink: 0; line-height: 1.4; }
+.mc-g-track { flex: 1; height: 6px; background: rgba(100,200,220,.08); border-radius: 3px; overflow: hidden; }
+.mc-g-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #0ea5b5, #5cc8d5); animation: barGrow .9s ease forwards; transform-origin: left; }
+@keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.mc-g-val { font-size: 12px; font-weight: 600; color: #7dd8e2; width: 48px; text-align: right; flex-shrink: 0; }
+.mc-g-divider { border: none; border-top: 1px solid rgba(100,200,220,.08); margin: 14px 0; }
+.mc-big-stat { display: flex; gap: 12px; flex-wrap: wrap; }
+.mc-big-item { flex: 1; min-width: 100px; background: rgba(14,165,181,.06); border: 1px solid rgba(100,200,220,.1); border-radius: 10px; padding: 12px; }
+.mc-big-val { font-size: 22px; font-weight: 700; letter-spacing: -.03em; color: #5cc8d5; }
+.mc-big-desc { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+/* prototype embed */
+.proto-embed-wrap { position: relative; width: 100%; height: 520px; background: rgba(3,14,22,.6); border-radius: 0 0 8px 8px; overflow: hidden; }
+.proto-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; }
+
+/* ── HERO BAND ── */
+.hero-band { max-width: 950px; margin: 0 auto; padding: 56px 0 44px; text-align: center; border-bottom: 1px solid rgba(100,200,220,.08); margin-bottom: 32px; }
+.hb-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--primary); font-weight: 400; margin-bottom: 16px; opacity: .9; }
+.hb-h1 { font-family: 'Roboto', system-ui, sans-serif; font-weight: 700; font-size: clamp(26px,3.5vw,44px); line-height: 1.1; letter-spacing: -.02em; margin-bottom: 14px; }
+.hb-h1 em { font-style: normal; color: var(--primary); font-weight: 800; }
+.hb-sub { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 500px; margin: 0 auto 30px; }
+.hb-sub em { font-style: italic; color: var(--text); }
+.hb-stats { display: flex; justify-content: center; gap: 44px; margin-bottom: 36px; }
+.hb-stat-n { font-size: 20px; font-weight: 600; color: var(--plight); letter-spacing: -.02em; }
+.hb-stat-l { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.hb-divider { display: flex; align-items: center; gap: 12px; }
+.hb-divider::before, .hb-divider::after { content: ''; flex: 1; height: 1px; background: rgba(100,200,220,.1); }
+.hb-divider-label { font-size: 11px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+
+/* image slots */
+.cs-img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.cs-img-slot { border-radius: 8px; overflow: hidden; border: 1px solid rgba(100,200,220,.1); background: rgba(14,165,181,.04); aspect-ratio: 16/10; position: relative; }
+.cs-img-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cs-img-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: rgba(100,200,220,.3); letter-spacing: .06em; }
+.cs-img-slot[data-label]::after { content: attr(data-label); position: absolute; bottom: 0; left: 0; right: 0; padding: 4px 8px; font-size: 10px; color: var(--muted); background: rgba(3,14,22,.75); }
+.proto-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--plight); padding: 7px 14px; border: 1px solid rgba(100,200,220,.2); border-radius: 8px; transition: all .2s; text-decoration: none; }
+.proto-link:hover { background: rgba(14,165,181,.1); border-color: var(--primary); }
+
+/* process */
+.process-card {
+  background: rgba(9,18,31,.75);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--gb);
+  border-radius: 14px; padding: 16px;
+  max-width: 950px;
+}
+.pc-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 10px; }
+.pc-step { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(100,200,220,.08); }
+.pc-step:last-child { border-bottom: none; }
+.pc-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(14,165,181,.1); border: 1px solid rgba(14,165,181,.22); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--plight); flex-shrink: 0; margin-top: 1px; }
+.pc-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.pc-desc { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* experience */
+.exp-card {
+  background: rgba(9,18,31,.75);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--gb);
+  border-radius: 14px; padding: 16px;
+  max-width: 950px;
+}
+.exp-item { padding: 10px 0; border-bottom: 1px solid rgba(100,200,220,.08); }
+.exp-item:last-child { border-bottom: none; }
+.exp-company { font-size: 13px; font-weight: 600; color: var(--plight); }
+.exp-role { font-size: 13px; font-weight: 500; margin-top: 2px; }
+.exp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.exp-detail { font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+
+/* ── BOTTOM INPUT ── */
+#inputArea {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+  background: rgba(3,10,18,.9);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border-top: 1px solid rgba(100,200,220,.1);
+  box-shadow: 0 -1px 0 rgba(255,255,255,.04);
+  padding: 10px 24px 20px;
+}
+.ia-inner { max-width: 950px; margin: 0 auto; }
+#chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 28px; }
+.chip {
+  padding: 5px 13px;
+  border: 1px solid rgba(100,200,220,.18);
+  border-radius: 100px;
+  font-size: 12px; cursor: pointer;
+  background: rgba(100,200,220,.06);
+  color: var(--muted); font-family: inherit;
+  transition: all .2s; backdrop-filter: blur(6px);
+}
+.chip:hover { border-color: var(--primary); color: var(--plight); background: rgba(100,200,220,.14); transform: translateY(-1px); }
+.ia-row { display: flex; gap: 10px; align-items: center; }
+.ia-input {
+  flex: 1;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(100,200,220,.18);
+  border-radius: 100px;
+  padding: 11px 18px;
+  font: inherit; font-size: 13px; color: var(--text);
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  backdrop-filter: blur(12px);
+}
+.ia-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14,165,181,.1); }
+.ia-input::placeholder { color: rgba(122,139,160,.5); }
+.ia-send {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--primary), #076575); border: none; border-radius: 50%;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: opacity .2s, transform .2s;
+  box-shadow: 0 2px 12px rgba(14,165,181,.3);
+}
+.ia-send:hover { opacity: .88; transform: scale(1.05); }
+.ia-send svg { width: 15px; height: 15px; fill: #fff; }
+.ia-reset { width: 40px; height: 40px; background: rgba(100,200,220,.07); border: 1px solid rgba(100,200,220,.15); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .2s, border-color .2s; }
+.ia-reset:hover { background: rgba(100,200,220,.14); border-color: rgba(100,200,220,.3); }
+.ia-reset svg { width: 15px; height: 15px; fill: var(--muted); }
+
+/* ── UTILS ── */
+.fade { animation: fadeUp .35s ease forwards; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:4px}
+
+/* ── RESPONSIVE ── */
+
+/* prevent any horizontal blowout */
+html, body { overflow-x: hidden; }
+.bub { max-width: min(950px, calc(100vw - 80px)); }
+.msg-card, .metric-card, .quote-card { max-width: min(950px, calc(100vw - 32px)); }
+
+/* tablet: 600-950px */
+@media (max-width: 950px) {
+  .h-status { display: none; }
+  .h-nav { gap: 10px; }
+  .h-cs-btn { font-size: 11px; padding: 4px 10px; }
+  .metric-card { max-width: 100%; }
+  .mc-metrics { gap: 10px; }
+  .out-grid { grid-template-columns: 1fr 1fr; }
+  .proto-embed-wrap { height: 420px; }
+  #chatWrap { padding: 72px 20px 200px; }
+  #inputArea { padding: 10px 20px 18px; }
+}
+
+/* large mobile: 480-600px */
+@media (max-width: 600px) {
+  header { padding: 0 16px; height: 52px; }
+  .h-cs-btn { display: none; }
+  .h-nav { gap: 10px; }
+  .h-nav-btn { font-size: 12px; }
+  .h-nav .h-cta { padding: 5px 12px; font-size: 11px; }
+
+  #chatWrap { padding: 64px 12px 185px; }
+  #inputArea { padding: 8px 12px 14px; }
+
+  .hero-band { padding: 36px 8px 28px; }
+  .hb-h1 { font-size: clamp(20px, 7vw, 30px); }
+  .hb-sub { font-size: 13px; max-width: 100%; }
+
+  .msgs { gap: 10px; }
+  .bub { font-size: 13px; padding: 10px 13px; }
+  .msg-av { width: 28px; height: 28px; font-size: 10px; }
+
+  .mc-body { padding: 12px; }
+  .mc-title { font-size: 14px; }
+  .mc-metrics { flex-wrap: wrap; gap: 8px; }
+  .mc-mv { font-size: 18px; }
+  .metric-card { padding: 14px; }
+  .mc-big-items { flex-wrap: wrap; gap: 8px; }
+  .mc-big-item { min-width: calc(50% - 4px); }
+
+  .cs-img-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .out-grid { grid-template-columns: 1fr 1fr; }
+  .proto-embed-wrap { height: 320px; }
+
+  #chips { gap: 5px; }
+  .chip { font-size: 11px; padding: 4px 10px; }
+  .quote-card { font-size: 13px; padding: 14px 16px; }
+}
+
+/* small mobile: ≤480px */
+@media (max-width: 480px) {
+  header { padding: 0 14px; }
+  .h-nav-btn { display: none; }
+  .h-nav { gap: 8px; }
+  .h-nav .h-cta { font-size: 11px; padding: 5px 12px; }
+
+  #chatWrap { padding: 60px 10px 180px; }
+  #inputArea { padding: 6px 10px 14px; }
+
+  .hero-band { padding: 28px 4px 24px; }
+  .hb-h1 { font-size: clamp(18px, 8vw, 26px); }
+  .hb-sub { font-size: 12.5px; }
+  .hb-divider-label { font-size: 10px; letter-spacing: .08em; }
+
+  .bub { font-size: 12.5px; padding: 9px 12px; }
+  .msg-av { width: 26px; height: 26px; }
+
+  .cs-img-grid { grid-template-columns: 1fr; }
+  .out-grid { grid-template-columns: 1fr; }
+  .proto-embed-wrap { height: 260px; }
+
+  .mc-metrics { gap: 6px; }
+  .mc-big-item { min-width: 100%; }
+  .chip { font-size: 11px; padding: 4px 9px; }
+
+  .ps-item { flex-direction: column; gap: 4px; }
+  .ps-num { width: 22px; height: 22px; font-size: 10px; }
+}
+
+/* very small: ≤360px */
+@media (max-width: 360px) {
+  .h-nav .h-cta { display: none; }
+  .hb-h1 { font-size: 18px; }
+  .bub { font-size: 12px; }
+  .proto-embed-wrap { height: 220px; }
+}
+</style>
+</head>
+<body>
+
+<div class="uw" aria-hidden="true">
+  <div class="b" style="width:6px;height:6px;left:8%;bottom:-10%;animation-duration:110s;animation-delay:-20s"></div>
+  <div class="b" style="width:10px;height:10px;left:18%;bottom:-10%;animation-duration:90s;animation-delay:-5s"></div>
+  <div class="b" style="width:4px;height:4px;left:32%;bottom:-10%;animation-duration:130s;animation-delay:-40s"></div>
+  <div class="b" style="width:16px;height:16px;left:45%;bottom:-10%;animation-duration:100s;animation-delay:-15s"></div>
+  <div class="b" style="width:7px;height:7px;left:58%;bottom:-10%;animation-duration:120s;animation-delay:-60s"></div>
+  <div class="b" style="width:12px;height:12px;left:70%;bottom:-10%;animation-duration:95s;animation-delay:-30s"></div>
+  <div class="b" style="width:5px;height:5px;left:80%;bottom:-10%;animation-duration:140s;animation-delay:-10s"></div>
+  <div class="b" style="width:20px;height:20px;left:90%;bottom:-10%;animation-duration:85s;animation-delay:-50s"></div>
+  <div class="b" style="width:8px;height:8px;left:25%;bottom:-10%;animation-duration:115s;animation-delay:-75s"></div>
+  <div class="b" style="width:14px;height:14px;left:65%;bottom:-10%;animation-duration:105s;animation-delay:-35s"></div>
+</div>
+
+<header>
+  <a href="#" class="h-logo">Meghan<span>.</span></a>
+  <div class="h-status">
+    <span class="h-dot"></span>
+    Meghan's Agent is active
+  </div>
+  <nav class="h-nav" aria-label="Site links">
+    <button class="h-cs-btn" onclick="openCS(1)" aria-label="Open Internal Knowledge Engine case study">Internal Knowledge Engine</button>
+    <button class="h-cs-btn" onclick="openCS(2)" aria-label="Open Cassini case study">Cassini</button>
+    <button class="h-nav-btn" onclick="openAbout()" aria-label="About Meghan">About Me</button>
+    <button class="h-nav-btn" onclick="openResume()" aria-label="View resume">Resume</button>
+    <a href="mailto:meghan.kulkarni@gmail.com" class="h-cta" target="_blank" rel="noopener">Email Meghan</a>
+  </nav>
+</header>
+
+<div id="chatWrap" role="main">
+  <div class="hero-band" aria-hidden="false">
+    <div class="hb-eyebrow"></div>
+<h1 class="hb-h1">Hey, I'm Meghan.</h1>
+    <p class="hb-sub">Product Designer untangling complex B2B SaaS flows into the obvious.</p>
+    <div class="hb-divider"><span class="hb-divider-label">Chat with my portfolio agent</span></div>
+  </div>
+  <div class="msgs" id="msgs" role="log" aria-live="polite" aria-label="Conversation with Meghan's Agent"></div>
+</div>
+
+<div id="inputArea">
+  <div class="ia-inner">
+    <div id="chips" role="group" aria-label="Suggested questions"></div>
+    <div class="ia-row">
+      <label for="userInput" class="sr-only">Ask Meghan's Agent a question</label>
+      <input id="userInput" class="ia-input" placeholder="Ask me anything about Meghan's work…" autocomplete="off">
+      <button id="resetBtn" class="ia-reset" aria-label="Restart conversation" title="Restart conversation">
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      </button>
+      <button id="sendBtn" class="ia-send" aria-label="Send message">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const msgsEl  = document.getElementById('msgs');
+const chipsEl = document.getElementById('chips');
+const inputEl = document.getElementById('userInput');
+
+// ── render ──────────────────────────────────────────────────────────────────
+
+let suppressScroll = false;
+function scrollDown() {
+  if (suppressScroll) return;
+  const w = document.getElementById('chatWrap');
+  setTimeout(() => w.scrollTop = w.scrollHeight, 60);
+}
+
+function addBubble(html, role) {
+  const w = document.createElement('div');
+  w.className = `msg ${role} fade`;
+  if (role === 'agent') {
+    w.innerHTML = `<div class="msg-av" aria-hidden="true"><img src="meghan.png" alt="Meghan"></div><div class="bub">${html}</div>`;
+  } else {
+    w.innerHTML = `<div class="bub">${html}</div>`;
+  }
+  msgsEl.appendChild(w);
+  scrollDown();
+  return w;
+}
+
+function addCard(html) {
+  const w = document.createElement('div');
+  w.className = 'msg agent fade';
+  w.innerHTML = `<div class="msg-av" aria-hidden="true"><img src="meghan.png" alt="Meghan"></div><div class="msg-card-wrap">${html}</div>`;
+  msgsEl.appendChild(w);
+  scrollDown();
+  return w;
+}
+
+let typingEl = null;
+function showTyping() {
+  typingEl = document.createElement('div');
+  typingEl.className = 'msg agent fade';
+  typingEl.id = 'typ';
+  typingEl.setAttribute('aria-label', 'Meghan\'s Agent is typing');
+  typingEl.innerHTML = `<div class="msg-av" aria-hidden="true"><img src="meghan.png" alt="Meghan"></div><div class="bub"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  msgsEl.appendChild(typingEl);
+  scrollDown();
+}
+function hideTyping() { if (typingEl) { typingEl.remove(); typingEl = null; } }
+
+// ── chips ───────────────────────────────────────────────────────────────────
+
+function setChips(list) {
+  chipsEl.innerHTML = '';
+  list.forEach(label => {
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = label;
+    b.onclick = () => { send(label); };
+    chipsEl.appendChild(b);
+  });
+}
+
+function setSectionChips(sections) {
+  chipsEl.innerHTML = '';
+  sections.forEach(label => {
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = label;
+    b.onclick = () => {
+      const tags = document.querySelectorAll('.section-tag');
+      for (const tag of tags) {
+        if (tag.textContent.toLowerCase().includes(label.toLowerCase())) {
+          tag.closest('.msg').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+      }
+    };
+    chipsEl.appendChild(b);
+  });
+}
+
+// ── card templates ───────────────────────────────────────────────────────────
+
+function tplCS1() {
+  return `<div class="msg-card">
+    <div class="mc-vis mc-vis-1" style="height:160px;padding:10px;overflow:hidden"><img src="Animation - Agent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block"></div>
+    <div class="mc-body">
+      <div class="mc-tags"><span class="mc-tag">AI Agents</span><span class="mc-tag">UX/UI</span><span class="mc-tag">Design Thinking</span></div>
+      <div class="mc-title">Internal Knowledge Engine</div>
+      <div class="mc-sub">AI Knowledge Base · Accrete AI · 2025 - Present</div>
+      <div class="mc-metrics">
+        <div><div class="mc-mv" style="color:#0ea5b5">200+</div><div class="mc-ml">internal users</div></div>
+        <div><div class="mc-mv" style="color:#0ea5b5">30</div><div class="mc-ml">features from research</div></div>
+        <div><div class="mc-mv" style="color:#0ea5b5">15</div><div class="mc-ml">engineers</div></div>
+      </div>
+      <button class="mc-cta" onclick="openCS(1)">Read the full story →</button>
+    </div>
+  </div>`;
+}
+
+function tplCS2() {
+  return `<div class="msg-card">
+    <div class="mc-vis mc-vis-2" style="padding:10px;overflow:hidden"><img src="riskm.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block"></div>
+    <div class="mc-body">
+      <div class="mc-tags"><span class="mc-tag">AI Co-pilot</span><span class="mc-tag">ITSM</span><span class="mc-tag">0→1</span><span class="mc-tag">Fortune 10</span></div>
+      <div class="mc-title">Cassini</div>
+      <div class="mc-sub">AI-driven IT Change Management · Accrete AI · 2023-2025</div>
+      <div class="mc-metrics">
+        <div><div class="mc-mv" style="color:#5cc8d5">$200M</div><div class="mc-ml">value realization</div></div>
+        <div><div class="mc-mv" style="color:#5cc8d5">0→1</div><div class="mc-ml">shipped early 2025</div></div>
+        <div><div class="mc-mv" style="color:#5cc8d5">13</div><div class="mc-ml">engineers on team</div></div>
+      </div>
+      <button class="mc-cta" onclick="openCS(2)">Read the full story →</button>
+    </div>
+  </div>`;
+}
+
+function tplCassiniFeatureOrigins() {
+  const features = [
+    {
+      name: 'Risk Model',
+      signal: 'Users couldn\'t distinguish high-risk tickets from routine ones without manually digging through metadata. Reviewers were rubber-stamping to clear the queue, not because they were careless, but because the system gave them no way to triage quickly.',
+      outcome: 'An AI-generated criticality score surfaced per ticket at a glance, with confidence signals and the reasoning behind each flag, so engineers could trust and act on it.',
+    },
+    {
+      name: 'Knowledge Graph',
+      signal: 'Multiple users described the same gap: no way to see how a change was connected to prior incidents or other in-flight tickets. Context that existed in the system was invisible at decision time.',
+      outcome: 'A contextual graph layer connecting tickets across incidents, changes, and environment history, revealing degrees of separation between related events without overwhelming the default view.',
+    },
+    {
+      name: 'Incident Remediation',
+      signal: 'When an incident occurred, the path to resolution required too many manual steps and too much context-switching. Users stalled at multi-select flows that forced decisions the system already had the data to make.',
+      outcome: 'A 2-step remediation flow where the system auto-selects the best-match resolution and the user confirms, reducing friction without removing control.',
+    },
+  ];
+  return `<div class="metric-card" style="padding:16px">
+    <div class="mc-g-label" style="margin-bottom:12px">Discovery → Features</div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      ${features.map((f, i) => `
+        <div style="padding:12px 0;${i < features.length - 1 ? 'border-bottom:1px solid rgba(100,200,220,.07)' : ''}">
+          <div style="font-size:13px;font-weight:700;color:#7dd8e2;margin-bottom:6px">${f.name}</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6"><strong style="color:var(--text);font-weight:500">Signal:</strong> ${f.signal}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function tplCassiniDiscovery() {
+  const quotes = [
+    { q: 'The problem isn\'t that I don\'t trust the AI. It\'s that when it flags something, I have no way to verify it quickly. I\'ll spend 20 minutes digging through logs trying to understand what it saw that I didn\'t. If it just showed me the reasoning, I\'d approve or reject in two minutes.', attr: 'Senior infrastructure engineer' },
+    { q: 'We had an incident last quarter that a smarter pre-approval check would have caught. The change looked routine on paper. Nobody connected it to three other tickets that had failed in the same environment two weeks prior. That context exists, we just had no way to surface it in time.', attr: 'IT operations lead, enterprise client' },
+    { q: 'I don\'t need a dashboard. I need the right information at the moment I\'m making a decision. Right now I\'m switching between four different tools to get a full picture of one ticket. That\'s where the time goes.', attr: 'Change manager, ITSM team' },
+    { q: 'What I really want to know is how many steps away this ticket is from something that already went wrong. If this change touches the same service as an incident from last week, I need to see that connection immediately, not piece it together myself after the fact.', attr: 'Senior infrastructure engineer, Fortune 10 CPG' },
+  ];
+  return `<div class="metric-card" style="padding:16px">
+    <div class="mc-g-label" style="margin-bottom:12px">Discovery · Client Wants</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${quotes.map(q => `
+        <div style="border-left:2px solid rgba(14,165,181,.35);padding:10px 14px;background:rgba(14,165,181,.05);border-radius:0 8px 8px 0">
+          <div style="font-size:13px;font-style:italic;color:var(--text);line-height:1.65;margin-bottom:5px">"${q.q}"</div>
+          <div style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.04em">${q.attr}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function tplCassiniProcess() {
+  const phases = [
+    { label: 'Discovery', highlight: true,  detail: 'Client syncs · requirements gathering · user flow mapping · feasibility scoping' },
+    { label: 'Lo-fi',     highlight: false, detail: 'Rapid wireframes · alignment with client before high-fidelity commitment' },
+    { label: 'Testing',   highlight: true,  detail: 'Power user sessions · friction identification · unmet needs surfaced' },
+    { label: 'Hi-fi',     highlight: false, detail: 'Glassmorphic visual system · component-level design with eng collaboration' },
+    { label: 'Iterate',   highlight: true,  detail: 'Complexity reduction · 4-step → 2-step remediation · AG grid → list view' },
+    { label: 'Ship',      highlight: false, detail: '0→1 launched early 2025 · $200M value realization' },
+  ];
+  return `<div class="metric-card" style="padding:16px">
+    <div class="mc-g-label" style="margin-bottom:12px">Design Process · Cassini</div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      ${phases.map((p, i) => `
+        <div style="padding:10px 0;${i < phases.length-1 ? 'border-bottom:1px solid rgba(100,200,220,.07)' : ''}">
+          <div style="font-size:13px;font-weight:${p.highlight ? '600' : '500'};color:${p.highlight ? '#7dd8e2' : 'var(--text)'};margin-bottom:3px">${p.label}</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.55">${p.detail}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function tplFlowImage() {
+  return `<div class="metric-card" style="padding:12px">
+    <div class="cs-img-slot" style="aspect-ratio:auto;width:100%">
+      <img src="user.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block">
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">An example of a user flow map built collaboratively with power users to understand how the Risk Model, Knowledge Graph, and Incident Remediation would connect with one another. <em>*Sensitive data blurred out.</em></div>
+  </div>`;
+}
+
+function tplIKEPrototype() {
+  const PROTOTYPE_URL = 'https://www.figma.com/proto/XFFZRwIs2uUn4uqR2dhBqg/Work-Sample?node-id=2103-13203&t=d9hYCLHjtvUkDsoV-0&scaling=contain&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=2103%3A13203';
+  return `<div class="metric-card" style="padding:18px 20px">
+    <a href="${PROTOTYPE_URL}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;background:rgba(14,165,181,.12);border:1px solid rgba(14,165,181,.35);border-radius:10px;color:#5cc8d5;font-size:14px;font-weight:600;text-decoration:none;letter-spacing:.01em;transition:background .2s,border-color .2s" onmouseover="this.style.background='rgba(14,165,181,.22)';this.style.borderColor='rgba(14,165,181,.6)'" onmouseout="this.style.background='rgba(14,165,181,.12)';this.style.borderColor='rgba(14,165,181,.35)'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      Open interactive prototype in Figma
+    </a>
+  </div>`;
+}
+
+function tplCassiniImages() {
+  const PROTOTYPE_URL = 'https://www.figma.com/proto/XFFZRwIs2uUn4uqR2dhBqg/Work-Sample?page-id=2575%3A88260&node-id=2575-112019&viewport=547%2C301%2C0.02&t=jqwcTen8XI76EGSy-1&scaling=contain&content-scaling=fixed&starting-point-node-id=2575%3A112019';
+  return `<div class="metric-card" style="padding:18px 20px">
+    <a href="${PROTOTYPE_URL}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;background:rgba(14,165,181,.12);border:1px solid rgba(14,165,181,.35);border-radius:10px;color:#5cc8d5;font-size:14px;font-weight:600;text-decoration:none;letter-spacing:.01em;transition:background .2s,border-color .2s" onmouseover="this.style.background='rgba(14,165,181,.22)';this.style.borderColor='rgba(14,165,181,.6)'" onmouseout="this.style.background='rgba(14,165,181,.12)';this.style.borderColor='rgba(14,165,181,.35)'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      Open interactive prototype in Figma
+    </a>
+  </div>`;
+}
+
+function tplCassiniMetrics() {
+  return `<div class="metric-card">
+    <div class="mc-g-label">Cassini · Impact &amp; Scope</div>
+    <div class="mc-big-stat">
+      <div class="mc-big-item"><div class="mc-big-val">$200M</div><div class="mc-big-desc">Value realization for Fortune 10 CPG client</div></div>
+      <div class="mc-big-item"><div class="mc-big-val">2 yrs</div><div class="mc-big-desc">0→1 in 2 years, shipped early 2025</div></div>
+      <div class="mc-big-item"><div class="mc-big-val">13</div><div class="mc-big-desc">Engineers collaborating on design-eng pipeline</div></div>
+    </div>
+  </div>`;
+}
+
+function tplSkills() {
+  const s = [['Figma Suite',98],['Framer',88],['UX Research',92],['A/B Testing',85],['Design Systems',93],['HTML / CSS',82],['AI Tools (Claude, Cursor, V0)',90],['SPSS / Data Analysis',78]];
+  return `<div class="skill-card">
+    <div class="sk-head">Skills &amp; tools</div>
+    ${s.map(([n,p])=>`<div class="sk-row"><span>${n}</span><div class="sk-bar"><div class="sk-fill" style="width:${p}%"></div></div></div>`).join('')}
+  </div>`;
+}
+
+function tplOutcomes1() {
+  return `<div class="out-card">
+    <div class="out-label">Current Results · Internal Knowledge Engine</div>
+    <div class="out-grid">
+      <div class="out-item"><div class="out-val" style="color:#0ea5b5">33</div><div class="out-desc">New employees used IKE for onboarding</div></div>
+      <div class="out-item"><div class="out-val" style="color:#0ea5b5">30+</div><div class="out-desc">Product features shipped from research cycles</div></div>
+<div class="out-item"><div class="out-val" style="color:#0ea5b5">40%</div><div class="out-desc">Estimated increase in efficiency</div></div>
+    </div>
+  </div>`;
+}
+
+function tplOutcomes2() {
+  return `<div class="out-card">
+    <div class="out-label">Results · Cassini</div>
+    <div class="out-grid">
+      <div class="out-item"><div class="out-val" style="color:#5cc8d5">$200M</div><div class="out-desc">Value realization driven for Fortune 10 CPG client</div></div>
+      <div class="out-item"><div class="out-val" style="color:#5cc8d5">0→1</div><div class="out-desc">Full product shipped from scratch, early 2025</div></div>
+      <div class="out-item"><div class="out-val" style="color:#5cc8d5">2 steps</div><div class="out-desc">Incident remediation flow reduced from 4-step to 2</div></div>
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(100,200,220,.1)">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">Team</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">13 Engineers · 1 PM · 1 Designer (Meghan) · Fortune 10 CPG Client · Power Users</div>
+    </div>
+  </div>`;
+}
+
+function tplContact() {
+  return `<div class="contact-card">
+    <div class="cc-head">
+      <div class="cc-av">MK</div>
+      <div><div class="cc-name">Meghan Kulkarni</div><div class="cc-role">Product Designer II · Accrete AI · New York</div></div>
+    </div>
+    <div class="cc-links">
+      <a href="mailto:meghan.kulkarni@gmail.com" class="cc-link">✉&ensp;meghan.kulkarni@gmail.com</a>
+      <a href="tel:+19174472584" class="cc-link">✆&ensp;+1 917 447 2584</a>
+      <a href="http://meghanportfolio.com" target="_blank" class="cc-link">⬡&ensp;meghanportfolio.com</a>
+    </div>
+  </div>`;
+}
+
+function tplProcess() {
+  const steps = [
+    ['Discover','User research first: moderated sessions, contextual inquiry, quantitative analysis.'],
+    ['Define','Synthesize findings into clear problem statements. Share with stakeholders before designing.'],
+    ['Design','Prototype fast, show work early, iterate on feedback not assumptions.'],
+    ['Deliver','Ship with engineering. Define success metrics before launch, not after.'],
+    ['Measure','Track outcomes post-launch and bring that data back to the next problem.'],
+  ];
+  return `<div class="process-card">
+    <div class="pc-label">Design process</div>
+    ${steps.map((s,i)=>`<div class="pc-step"><div class="pc-num">${i+1}</div><div><div class="pc-title">${s[0]}</div><div class="pc-desc">${s[1]}</div></div></div>`).join('')}
+  </div>`;
+}
+
+function tplExperience() {
+  return `<div class="exp-card">
+    <div class="exp-item">
+      <div class="exp-company">Accrete AI · New York</div>
+      <div class="exp-role">Product Designer II, Founding Designer, ITSM</div>
+      <div class="exp-meta">Feb 2022 - Present</div>
+      <div class="exp-detail">Designs agent-based products for Fortune 10 clients. Led user research that drove $200M+ in business impact and 30 new product features.</div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-company">Avesha · Burlington, MA</div>
+      <div class="exp-role">Product Designer</div>
+      <div class="exp-meta">Dec 2021 - Feb 2022</div>
+      <div class="exp-detail">Led cross-functional teams for a Kubernetes-based application. Built an audit system that surfaced 50+ critical bugs.</div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-company">Keurig Dr. Pepper · Burlington, MA</div>
+      <div class="exp-role">UX & Design Engineering Co-op</div>
+      <div class="exp-meta">Jan - Jul 2020</div>
+      <div class="exp-detail">Managed 150+ digital asset workflows. Optimized HTML across Keurig.com for search performance.</div>
+    </div>
+    <div class="exp-item" style="border-bottom:none">
+      <div class="exp-company">Northeastern University</div>
+      <div class="exp-role">BS Experience Design + Business Administration</div>
+    </div>
+  </div>`;
+}
+
+// ── Cassini section helpers ───────────────────────────────────────────────────
+
+function tplSectionTag(label) {
+  return `<div class="section-tag-row"><span class="section-tag">${label}</span><div class="section-tag-line"></div></div>`;
+}
+
+function tplListCard(items) {
+  return `<div class="list-card"><div class="list-items">${items.map(i => `<div class="list-item"><span>${i}</span></div>`).join('')}</div></div>`;
+}
+
+function tplCassiniStructure() {
+  const rows = [
+    { label: 'Duration', value: '2023 - 2025' },
+    { label: 'Team', value: '13 Engineers · Product Designer · Product Manager · Client, Fortune 10 CPG Company · Power Users' },
+    { label: 'My Role', value: 'Feature Ideation / Conceptualization · Engineering-Design Pipeline · Iterations from User Testing · Design-Client Relationship · Design' },
+  ];
+  return `<div class="metric-card" style="padding:16px">
+    <div style="display:flex;flex-direction:column;gap:0">
+      ${rows.map((r, i) => `
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:10px 0;${i < rows.length-1 ? 'border-bottom:1px solid rgba(100,200,220,.07)' : ''}">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);min-width:80px;flex-shrink:0;padding-top:2px">${r.label}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6">${r.value}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function tplCassiniGoals() {
+  return tplListCard([
+    'Apply <strong style="color:#5cc8d5">AI-driven risk modeling</strong> to change tickets <em>before</em> approval so <strong style="color:#5cc8d5">high-risk changes get flagged</strong>, not everything',
+    'Reduce the <strong style="color:#5cc8d5">cognitive load</strong> on IT reviewers who were rubber-stamping routine tickets to clear the queue',
+    'Allow application to <strong style="color:#5cc8d5">scale for future requirements</strong>',
+  ]);
+}
+
+function tplCassiniConstraints() {
+  return tplListCard([
+    '<strong style="color:#5cc8d5">Fortune 10 CPG client</strong> with strict requirements, compliance expectations, and existing ITSM workflows we had to fit into',
+    '<strong style="color:#5cc8d5">Data-dense domain</strong>: change tickets carry a lot of metadata; the UI had to surface signal without burying users in noise',
+    'Team of <strong style="color:#5cc8d5">13 engineers</strong>: design decisions had to be precise and dev-ready; ambiguity was expensive',
+    '<strong style="color:#5cc8d5">No existing design system</strong> or component library; visual language had to be built from zero alongside the product',
+  ]);
+}
+
+function tplCassiniRequirements() {
+  return tplListCard([
+    'Unified search across tickets, incidents, and changes',
+    'Incident Remediation: simplified from a 4-step multi-select flow to a 2-step auto-select',
+    'Glassmorphic visual system: layered depth to handle data density without visual overwhelm',
+  ]);
+}
+
+function tplCassiniExplorations() {
+  return tplListCard([
+    '<strong>AG Grid to list-view module layout</strong>: early versions used AG Grid; power users couldn\'t view ticket data and the Knowledge Graph side-by-side. Switched to a custom list-view that unlocked true parallel context',
+    '<strong>4-step Incident Remediation to 2 steps</strong>: original flow required manual multi-select from a popup; testing showed users stalling. New flow: system auto-selects the best-match incident, user confirms. Same outcome, half the steps',
+    '<strong>Lo-fi before hi-fi, always</strong>: wireframes went in front of the client before any high-fidelity commitment. Saved weeks of rework when requirements shifted',
+    '<strong>Glassmorphism for depth</strong>: tried flat and minimal approaches first; they flattened the hierarchy in a product where layered context is the whole point. Glassmorphism was the deliberate answer',
+    '<strong>Knowledge Graph visibility</strong>: explored always-on graph views, which overwhelmed the default experience. Landed on contextual reveal, depth available but not imposed',
+  ]);
+}
+
+function tplIKEStructure() {
+  const rows = [
+    { label: 'Duration', value: '2025 - Present' },
+    { label: 'Team', value: '15 Engineers · Product Designer' },
+    { label: 'My Role', value: 'Feature Ideation / Conceptualization · Engineering-Design Relationship · User Testing + Synthesizing Insight · Design' },
+  ];
+  return `<div class="metric-card" style="padding:16px">
+    <div style="display:flex;flex-direction:column;gap:0">
+      ${rows.map((r, i) => `
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:10px 0;${i < rows.length-1 ? 'border-bottom:1px solid rgba(100,200,220,.07)' : ''}">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);min-width:80px;flex-shrink:0;padding-top:2px">${r.label}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6">${r.value}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function tplIKEResearchStats() {
+  return `<div class="metric-card" style="padding:16px">
+    <div class="mc-g-label" style="margin-bottom:14px">Internal Research · Findings</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:160px;padding:14px;background:rgba(14,165,181,.06);border:1px solid rgba(14,165,181,.12);border-radius:8px">
+        <div style="font-size:28px;font-weight:700;color:#5cc8d5;font-family:'IBM Plex Mono',monospace;margin-bottom:6px">89%</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">believed faster access to information resulted in more accurate and complete decisions</div>
+      </div>
+      <div style="flex:1;min-width:160px;padding:14px;background:rgba(14,165,181,.06);border:1px solid rgba(14,165,181,.12);border-radius:8px">
+        <div style="font-size:28px;font-weight:700;color:#5cc8d5;font-family:'IBM Plex Mono',monospace;margin-bottom:6px">72%</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">wanted the ability to generate reports directly from documents and tickets</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function tplIKEDesignChallenges() {
+  const challenges = [
+    'Employees don\'t know what they don\'t know. How do you surface relevant knowledge without requiring the perfect search query?',
+    'Different roles need different knowledge. An engineer and a salesperson asking the same question may need very different answers.',
+    'How do you design <strong style="color:#5cc8d5">access controls</strong> that don\'t create friction for legitimate use cases?',
+    'How do you show where an answer came from so users can <strong style="color:#5cc8d5">verify it</strong>?',
+  ];
+  return `<div class="list-card"><div class="list-items">
+    <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:4px 0 8px">Core Design Challenges</div>
+    ${challenges.map(c => `<div class="list-item"><span>${c}</span></div>`).join('')}
+  </div></div>`;
+}
+
+function tplIKEModules() {
+  const modules = [
+    { name: 'Landing Page', desc: 'Users can create individual <strong style="color:#5cc8d5">Workspaces</strong>, Private or Shared with other users.' },
+    { name: 'Sources', desc: 'Users can upload documents, files, and other material to <strong style="color:#5cc8d5">train IKE\'s LLM</strong>, contributing to more personalized search results.' },
+    { name: 'Knowledge Graph', desc: 'Users can see <strong style="color:#5cc8d5">degrees of information</strong> between data files or searches. A visual deepdive into how knowledge connects.' },
+    { name: 'Configuration', desc: 'Users can customize workspaces per their requirements. A <strong style="color:#5cc8d5">passkey system</strong> restricts certain workspaces and integrations to specific members.' },
+  ];
+  return `<div class="metric-card" style="padding:16px">
+    <div class="mc-g-label" style="margin-bottom:12px">The Modules</div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      ${modules.map((m, i) => `
+        <div style="padding:12px 0;${i < modules.length - 1 ? 'border-bottom:1px solid rgba(100,200,220,.07)' : ''}">
+          <div style="font-size:13px;font-weight:700;color:#7dd8e2;margin-bottom:4px">${m.name}</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">${m.desc}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function tplCassiniABTesting() {
+  const tests = [
+    {
+      label: 'Side-by-Side List View',
+      desc: 'Replacing nested ticket navigation with a <strong style="color:#5cc8d5">parallel context view</strong> so users could see the Knowledge Graph alongside ticket data without switching screens.',
+      stats: [['47s avg nav time (baseline)', '38% reduction in time on task', '52% drop in mid-flow abandonment']],
+    },
+    {
+      label: 'Module-Based Navigation',
+      desc: 'Grouping ticket types into <strong style="color:#5cc8d5">visually distinct modules</strong> to reduce the cognitive load of remembering which rules applied to which ticket type.',
+      stats: [['29% baseline error rate', '41% error reduction', 'Task completion 61% to 89%']],
+    },
+    {
+      label: 'Power User Third Tab',
+      desc: 'A <strong style="color:#5cc8d5">dedicated monitoring surface</strong> for power users: a higher-level view surfacing cross-module activity without disrupting the standard user flow.',
+      stats: [['Cross-module time 3.2min to 45s', 'Satisfaction score 3.1 to 4.6 out of 5']],
+    },
+  ];
+  return `<div class="list-card">
+    <div class="list-items">
+      <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:10px 0 6px">A/B Testing</div>
+      ${tests.map((t, i) => `
+        <div style="padding:12px 0;${i < tests.length - 1 ? 'border-bottom:1px solid rgba(100,200,220,.07)' : ''}">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px">${t.label}</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:6px">${t.desc}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${t.stats[0].map(s => `<span style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:#5cc8d5;background:rgba(14,165,181,.07);border-radius:4px;padding:2px 7px">${s}</span>`).join('')}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ── queue helper ─────────────────────────────────────────────────────────────
+
+let _qids = [];
+function cancelQ() { _qids.forEach(id => clearTimeout(id)); _qids = []; }
+function q(actions) {
+  cancelQ();
+  let t = 0;
+  actions.forEach(([ms, fn]) => { t += ms; _qids.push(setTimeout(fn, t)); });
+}
+
+// Animate dots in cs1 card visual
+function animateDots(id) {
+  const c = document.getElementById(id);
+  if (!c) return;
+  ['rgba(14,165,181,.55)','rgba(92,200,213,.5)','rgba(14,165,181,.35)'].forEach(col => {
+    for (let i = 0; i < 5; i++) {
+      const d = document.createElement('span');
+      const sz = 4 + Math.random()*10;
+      d.style.cssText = `width:${sz}px;height:${sz}px;position:absolute;border-radius:50%;left:${5+Math.random()*90}%;top:${10+Math.random()*80}%;background:${col};animation:bounce ${2+Math.random()*2}s ease-in-out ${Math.random()*3}s infinite`;
+      c.appendChild(d);
+    }
+  });
+}
+
+// ── response handlers ─────────────────────────────────────────────────────────
+
+const R = {
+  greeting() {
+    q([
+      [0, () => showTyping()],
+      [950, () => {
+        hideTyping();
+        addBubble(`Hey, I'm Meghan. This is my portfolio. Ask me anything, or explore my two case studies below:`, 'agent');
+      }],
+      [1400, () => {
+        addCard(tplCS1());
+        setTimeout(() => animateDots('vd1'), 200);
+        addCard(tplCS2());
+      }],
+      [2300, () => setChips(['Internal Knowledge Engine', 'Cassini', 'About Me', 'My process', 'Contact'])],
+    ]);
+  },
+
+  about() {
+    q([
+      [0, () => showTyping()],
+      [950, () => {
+        hideTyping();
+        addBubble(`My journey began at Keurig Dr. Pepper Snapple Inc, where I discovered my passion for transforming caffeine into creativity ☕✨. From then on, I have worked primarily in the startup space where I ship products from 0-1 and am involved in all stages of the product development process.`, 'agent');
+      }],
+      [2200, () => addBubble(`Snippets from my life:`, 'agent')],
+      [2900, () => {
+        addCard(`<div class="metric-card" style="padding:12px;display:flex;gap:10px">
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="border-radius:8px;overflow:hidden;aspect-ratio:4/5"><img src="scuba.png" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Did I mention I am a certified scuba diver? Ask me what the coolest thing I have seen underwater is</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="border-radius:8px;overflow:hidden;aspect-ratio:4/5"><img src="pickle.png" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Pickleball master</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="border-radius:8px;overflow:hidden;aspect-ratio:4/5"><img src="cook.png" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Loves to host dinner parties</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="border-radius:8px;overflow:hidden;aspect-ratio:4/5"><img src="digi.png" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Digital nomaded in Spain and hiked the mountains of Costa Brava</div>
+        </div>
+      </div>`);
+      }],
+      [4500, () => setChips(['Show me your work', 'What do you specialize in?', 'See your experience', 'How do I reach you?'])],
+    ]);
+  },
+
+  work() {
+    q([
+      [0, () => showTyping()],
+      [850, () => {
+        hideTyping();
+        addBubble(`Two case studies, both at Accrete AI, both grounded in research:`, 'agent');
+      }],
+      [1300, () => {
+        addCard(tplCS1());
+        setTimeout(() => animateDots('vd1'), 200);
+      }],
+      [2000, () => addCard(tplCS2())],
+      [2500, () => setChips(['Internal Knowledge Engine', 'Cassini', "What's your process?"])],
+    ]);
+  },
+
+  cs1() {
+    msgsEl.innerHTML = '';
+    chipsEl.innerHTML = '';
+    suppressScroll = true;
+    document.getElementById('chatWrap').scrollTop = 0;
+    setTimeout(() => { suppressScroll = false; }, 1000);
+    q([
+      [0, () => showTyping()],
+      [500, () => {
+        hideTyping();
+
+        // 01 · Name of Study
+        addCard(tplSectionTag('01 · Name of Study'));
+        addCard(tplCS1());
+        addCard(tplIKEPrototype());
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="ike.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div></div>`);
+
+        // 02 · Structure
+        addCard(tplSectionTag('02 · Structure'));
+        addCard(tplIKEStructure());
+
+        // 03 · Problem
+        addCard(tplSectionTag('03 · Problem'));
+        addCard(`<div style="border-left:3px solid #5cc8d5;padding:14px 16px;background:rgba(14,165,181,.08);backdrop-filter:blur(8px);border-radius:0 10px 10px 0"><div style="font-size:14px;font-weight:600;line-height:1.7;color:var(--text)">How can organizations enable <strong style="color:#5cc8d5">smarter and faster decision-making</strong>?</div></div>`);
+        addBubble(`Accrete AI built IKE because they were living the problem themselves. As the company scaled, <strong style="color:#5cc8d5">knowledge started slipping through the cracks</strong>, buried in inboxes, scattered across tools, locked in the heads of people who might not even be at the company next quarter. Smart people were making slower decisions than they should have been, not because they lacked the information, but because they couldn't find it fast enough.`, 'agent');
+        addBubble(`I started by just listening. I interviewed people across every department, Finance, Sales, Marketing, Engineering, not to validate assumptions, but to understand what a day actually looked like. I <strong style="color:#5cc8d5">shadowed workflows</strong>, watched where people got stuck, and asked what they wished they could do that they currently couldn't.`, 'agent');
+        addCard(tplIKEResearchStats());
+        addCard(`<div class="quote-card">"We have millions of documents sitting across systems and no way to know which ones are actually relevant to a decision we're making right now. By the time someone finds the right information, the window has closed."<div class="quote-attr">Finance analyst, preliminary interview</div></div>`);
+        addCard(`<div class="quote-card">"Sales moves fast. But our knowledge doesn't keep up. By the time I find the right case study or competitive intel, the conversation has already moved on."<div class="quote-attr">Sales team member, preliminary interview</div></div>`);
+        addCard(`<div class="quote-card">"We produce so much content but there's no single place to find what's actually been used and what worked. Marketing is constantly recreating things that already exist."<div class="quote-attr">Marketing team member, preliminary interview</div></div>`);
+
+        // 04 · Ideation
+        addCard(tplSectionTag('04 · Ideation'));
+        addBubble(`Once the picture was clear, the ideas came fast. I started sketching immediately: <strong style="color:#5cc8d5">pencil and paper</strong>, whiteboards, low-fidelity wireframes. Nothing polished. The goal was to get thinking out of heads and onto paper quickly enough that we could react to it.`, 'agent');
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="sample.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div></div>`);
+        addBubble(`The Engineering team and I developed a <strong style="color:#5cc8d5">"sticky note" system</strong>, literally dropping feature sketches on each other's desks throughout the day to keep the conversation moving. No meeting required. It was a way to maintain a constant, low-friction feedback loop while we were both heads down building.`, 'agent');
+        addBubble(`Alongside the analog process, I also used <strong style="color:#5cc8d5">AI tools like Figma Make</strong> to accelerate wireframing. Being able to generate a quick structural layout and iterate on it immediately kept the pace up and gave the engineering team something concrete to react to earlier in the process.`, 'agent');
+        addCard(tplIKEDesignChallenges());
+
+        // 05 · Features
+        addCard(tplSectionTag('05 · Features'));
+addCard(tplIKEModules());
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="landing.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div><div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6"><strong style="color:#5cc8d5">Workspaces</strong> were built within the landing page to separate user groups. Different departments use IKE for different functions and queries, so workspaces give each group a dedicated environment tailored to their context.</div></div>`);
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="source.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div><div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6"><strong style="color:#5cc8d5">Sources</strong> are built for users to input documents or data to train the LLM, producing accurate output tailored to their function.</div></div>`);
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="knowledge.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div><div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6">The <strong style="color:#5cc8d5">Knowledge Graph</strong> visualizes degrees of separation between data points, documents, and queries. Primarily used by <strong style="color:#5cc8d5">government users</strong>, it surfaces how information connects across an organization, revealing relationships that wouldn't be obvious from a simple search.</div></div>`);
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="config.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div><div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6"><strong style="color:#5cc8d5">Configuration</strong> allows admins to connect data sources like <strong style="color:#5cc8d5">Jira</strong> and <strong style="color:#5cc8d5">Confluence</strong> directly to IKE. Admins can also restrict access at the workspace level, ensuring certain integrations and data are only available to the users who should see them.</div></div>`);
+
+        // 07 · User Testing
+        addCard(tplSectionTag('07 · User Testing'));
+        addBubble(`<a href="https://drive.google.com/file/d/1OjSPpG6kLrfouX0WXTItDMljKXvmOE0k/view" target="_blank" style="color:#5cc8d5;text-decoration:underline;text-underline-offset:3px">User testing</a> on IKE's dev platform involved <strong style="color:#5cc8d5">16 employees across different roles</strong> and surfaced more than 30 new features, each one coming from a real moment of friction we observed. But the theme that came up most consistently wasn't about functionality. Users wanted IKE to feel like a <strong style="color:#5cc8d5">personal assistant</strong>, not a search tool. That one insight reshaped a lot of what came next, including a voice-to-voice feature that put IKE in conversation with you rather than waiting to be queried.`, 'agent');
+        addBubble(`Designing the voice interface revealed a gap I hadn't seen addressed anywhere else: when a user switches from Voice to Text mid-session, there's no signal that <strong style="color:#5cc8d5">Voice is still listening</strong>. Most agentic applications, including <strong style="color:#5cc8d5">Claude</strong> and <strong style="color:#5cc8d5">Grok</strong>, go silent. Users assumed it had stopped and kept talking, or didn't realize they'd triggered inputs they didn't intend. It was a quiet trust problem.`, 'agent');
+        addBubble(`<strong style="color:#5cc8d5">Speech to Speech</strong> was my solution after identifying this gap: a continuous ambient animation tied to Voice activity state. An animation that stays alive as long as Voice is processing, regardless of which input mode the user is in. It's a small thing that makes the system feel honest. Users could move freely between Voice and Text and always know exactly what the system was doing.`, 'agent');
+        addCard(`<div class="metric-card" style="padding:18px 20px"><a href="https://www.figma.com/proto/XFFZRwIs2uUn4uqR2dhBqg/Work-Sample?node-id=2284-202034&t=d9hYCLHjtvUkDsoV-0&scaling=scale-down&content-scaling=fixed&page-id=2284%3A201106&starting-point-node-id=2284%3A202034" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;background:rgba(14,165,181,.12);border:1px solid rgba(14,165,181,.35);border-radius:10px;color:#5cc8d5;font-size:14px;font-weight:600;text-decoration:none;letter-spacing:.01em;transition:background .2s,border-color .2s" onmouseover="this.style.background='rgba(14,165,181,.22)';this.style.borderColor='rgba(14,165,181,.6)'" onmouseout="this.style.background='rgba(14,165,181,.12)';this.style.borderColor='rgba(14,165,181,.35)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>View Speech to Speech prototype</a></div>`);
+        addBubble(`<strong style="color:#5cc8d5">Source Citations</strong> were a consistent ask across user testing. When IKE returned an answer to a query, users wanted to know where that information was coming from. Without visibility into the source, outputs felt unverifiable, and unverifiable outputs don't get acted on. We added source attribution directly to query results, so users could trace every answer back to the document or data it came from.`, 'agent');
+        addCard(`<div class="metric-card" style="padding:18px 20px"><a href="https://www.figma.com/proto/XFFZRwIs2uUn4uqR2dhBqg/Work-Sample?node-id=2284-225961&t=d9hYCLHjtvUkDsoV-0&scaling=scale-down&content-scaling=fixed&page-id=2284%3A201106&starting-point-node-id=2284%3A225961" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;background:rgba(14,165,181,.12);border:1px solid rgba(14,165,181,.35);border-radius:10px;color:#5cc8d5;font-size:14px;font-weight:600;text-decoration:none;letter-spacing:.01em;transition:background .2s,border-color .2s" onmouseover="this.style.background='rgba(14,165,181,.22)';this.style.borderColor='rgba(14,165,181,.6)'" onmouseout="this.style.background='rgba(14,165,181,.12)';this.style.borderColor='rgba(14,165,181,.35)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>View Source Citations prototype</a></div>`);
+        addBubble(`<strong style="color:#5cc8d5">Inline Quote Editing</strong> came from a pattern we kept seeing: users didn't just want to consume what IKE generated. They wanted to push back on it. When IKE surfaced a quote in a report, users wanted to edit it, question it, or prompt for more depth. They were doing it anyway, just manually, outside the tool. So we brought it into the product. Users can now edit or expand any IKE-generated quote directly inside the document without breaking their flow. Every correction becomes a <strong style="color:#5cc8d5">training signal</strong>, letting IKE learn from the people who know the work best.`, 'agent');
+        addCard(`<div class="metric-card" style="padding:18px 20px"><a href="https://www.figma.com/proto/XFFZRwIs2uUn4uqR2dhBqg/Work-Sample?node-id=2284-229799&t=d9hYCLHjtvUkDsoV-0&scaling=scale-down&content-scaling=fixed&page-id=2284%3A201106&starting-point-node-id=2284%3A229799" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;background:rgba(14,165,181,.12);border:1px solid rgba(14,165,181,.35);border-radius:10px;color:#5cc8d5;font-size:14px;font-weight:600;text-decoration:none;letter-spacing:.01em;transition:background .2s,border-color .2s" onmouseover="this.style.background='rgba(14,165,181,.22)';this.style.borderColor='rgba(14,165,181,.6)'" onmouseout="this.style.background='rgba(14,165,181,.12)';this.style.borderColor='rgba(14,165,181,.35)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>View Inline Quote Editing prototype</a></div>`);
+
+        // 08 · Outcomes
+        addCard(tplSectionTag('08 · Outcomes'));
+        addCard(tplOutcomes1());
+        addBubble(`Where IKE goes next is something I think about a lot. The most logical evolution is a <strong style="color:#5cc8d5">single triage agent</strong> that handles multiple capabilities without the user having to choose which agent to invoke. It reads context and acts accordingly. Less menu, more colleague. Stay tuned.`, 'agent');
+
+        setSectionChips(['Structure', 'Problem', 'Ideation', 'Features', 'User Testing', 'Outcomes']);
+        const cassini = document.createElement('button');
+        cassini.className = 'chip';
+        cassini.style.cssText = 'border-color:rgba(14,165,181,.4);color:#5cc8d5;background:rgba(14,165,181,.1);';
+        cassini.textContent = '↗ Cassini';
+        cassini.onclick = () => { send('Cassini'); };
+        chipsEl.appendChild(cassini);
+      }],
+    ]);
+  },
+
+  cs2() {
+    msgsEl.innerHTML = '';
+    chipsEl.innerHTML = '';
+    suppressScroll = true;
+    document.getElementById('chatWrap').scrollTop = 0;
+    setTimeout(() => { suppressScroll = false; }, 1000);
+    q([
+      [0,   () => showTyping()],
+      [500, () => {
+        hideTyping();
+
+        // 01 · Name of Study
+        addCard(tplSectionTag('01 · Name of Study'));
+        addCard(tplCS2());
+        addCard(tplCassiniImages());
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="cassini.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div></div>`);
+
+        // 02 · Structure
+        addCard(tplSectionTag('02 · Structure'));
+        addCard(tplCassiniStructure());
+
+        // 03 · Problem
+        addCard(tplSectionTag('03 · Problem'));
+        addCard(`<div style="border-left:3px solid #5cc8d5;padding:14px 16px;background:rgba(14,165,181,.08);backdrop-filter:blur(8px);border-radius:0 10px 10px 0"><div style="font-size:14px;font-weight:600;line-height:1.7;color:var(--text)">Organizations lose nearly <strong style="color:#5cc8d5">$33,000 a minute</strong> when they respond to incidents and IT outages only after they occur, instead of identifying and addressing issues before they escalate.</div></div>`);
+        addCard(`<div class="quote-card">"The goal isn't to review every change more carefully. It's to surface the ones that actually need attention, and get out of the way for everything else."<div class="quote-attr">Problem framing, Cassini kickoff</div></div>`);
+
+        // 04 · Goals
+        addCard(tplSectionTag('04 · Goals'));
+        addCard(tplCassiniGoals());
+
+        // 05 · Constraints
+        addCard(tplSectionTag('05 · Constraints'));
+        addCard(tplCassiniConstraints());
+
+        // 06 · Design Thinking
+        addCard(tplSectionTag('06 · Design Thinking'));
+
+        addCard(tplCassiniDiscovery());
+        addCard(tplCassiniFeatureOrigins());
+        addCard(tplFlowImage());
+
+        // 07 · Lo-Fi Prototype
+        addCard(tplSectionTag('07 · Lo-Fi Prototype'));
+        addBubble(`The scope of Cassini was large from the start. There were <strong style="color:#5cc8d5">7 ticket types</strong> users needed to work across, Incident and Change being the primary surfaces, each with its own feature set and its own rules. Change tickets, for example, had a <strong style="color:#5cc8d5">risk model</strong> attached that scored criticality before anything went to approval. The complexity wasn't a bug; it reflected the real world these engineers lived in.`, 'agent');
+        addBubble(`The requirements never fully stabilized, and I stopped waiting for them to. Instead, I kept a <strong style="color:#5cc8d5">lo-fi prototype running continuously</strong>, adding features as the client shared data, pulling back when constraints shifted. One of the harder problems was <strong style="color:#5cc8d5">CMDB configuration data</strong>: dense, relational, not built to be displayed. I worked with Engineering to visualize it as knowledge graphs that surfaced how tickets connected across the system.`, 'agent');
+        addBubble(`When <strong style="color:#5cc8d5">V0</strong> launched mid-project, I folded it into the workflow immediately. It let me turn a rough idea into a concept sketch in minutes, something I could drop in front of a PM, an engineer, or the client to pressure-test before investing in higher fidelity. It changed the tempo of feedback.`, 'agent');
+        addCard(`<div class="metric-card" style="padding:12px;display:flex;flex-direction:column;gap:10px">
+          <div class="cs-img-slot" style="aspect-ratio:auto;width:100%">
+            <img src="dashboard.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block">
+          </div>
+          <div class="cs-img-slot" style="aspect-ratio:auto;width:100%">
+            <img src="riskmodel.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block">
+          </div>
+        </div>`);
+
+        // 08 · Design System
+        addCard(tplSectionTag('08 · Design System'));
+        addBubble(`At some point mid-project it became obvious we had a different problem: the product was built from two component libraries, <strong style="color:#5cc8d5">IBM and Material UI</strong>, and they were starting to work against each other. Inconsistency was accumulating faster than we could patch it.`, 'agent');
+        addBubble(`So we built <strong style="color:#5cc8d5">Paradigm</strong>. Not in one sprint, not from a blank canvas. We built it the only way that made sense given the timeline: feature by feature. When a new component was needed, we designed it once, properly, and added it to the system. Iterative by necessity, but it held together.`, 'agent');
+        addBubble(`The <strong style="color:#5cc8d5">Gantt Chart</strong> was the hardest test. The client wanted to visualize overlap between in-flight Change tickets, a completely reasonable ask, and genuinely useful. But it required a level of customization that nothing off the shelf could handle cleanly.`, 'agent');
+        addBubble(`Rather than ship something that looked close but behaved badly, we <strong style="color:#5cc8d5">scoped it deliberately</strong>. Users can click into individual bars to surface connections on demand, the same insight the client wanted, but delivered in a way that was buildable, maintainable, and actually usable under time pressure. Sometimes the right answer is a smaller door to the same room.`, 'agent');
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="gantchart.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div></div>`);
+
+        // 09 · Redesign
+        addCard(tplSectionTag('09 · Redesign'));
+        addBubble(`After two years of building incrementally, adding features as requirements came in, layering on top of what existed, we finally had room to step back and look at the whole thing. The redesign wasn't about making it look better. It was about making it make sense.`, 'agent');
+        addBubble(`The <strong style="color:#5cc8d5">information architecture</strong> had drifted. The Knowledge Graph, for example, had ended up nested inside ticket views because that's where it was needed when we first built it. But by the time the full product existed, that placement no longer made sense. The redesign was a chance to look at everything we'd built holistically and put it where users would actually expect to find it.`, 'agent');
+        addBubble(`Late in the process, the client introduced a new requirement that added another layer of complexity: <strong style="color:#5cc8d5">power users</strong> needed a dedicated view to monitor changes across the entire system, something standard users would never need. Now we were designing for <strong style="color:#5cc8d5">two distinct modes</strong> inside the same product, and neither could feel like a compromise.`, 'agent');
+        addCard(`<div style="display:flex;align-items:center;gap:10px;margin:4px 0 2px;max-width:950px"><span style="font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">User Testing</span><div style="flex:1;height:1px;background:rgba(100,200,220,.12)"></div></div>`);
+        addCard(`<div class="quote-card">"The information I need is all there. I just have to click through three levels to get to it. By the time I've found what I'm looking for, I've lost the context I started with."<div class="quote-attr">Power user, enterprise IT operations</div></div>`);
+        addCard(`<div class="quote-card">"Every ticket type works differently but they all look the same. I have to remember which rules apply to which. That's mental overhead I shouldn't have to carry."<div class="quote-attr">IT change analyst, Fortune 10 CPG</div></div>`);
+        addCard(`<div class="quote-card">"As a power user I'm managing across everything: incidents, changes, configurations. I need one place where I can see what's moved, what's pending, and what needs my attention. Right now that doesn't exist."<div class="quote-attr">Senior power user, ITSM team</div></div>`);
+        addCard(tplCassiniABTesting());
+        addCard(`<div class="metric-card" style="padding:12px"><div class="cs-img-slot" style="aspect-ratio:auto;width:100%"><img src="redesign.png" alt="" loading="lazy" style="width:100%;height:auto;object-fit:cover;border-radius:6px;display:block"></div></div>`);
+        addBubble(`<strong style="color:#5cc8d5">Cassini was shipped early 2025.</strong>`, 'agent');
+        addCard(tplCassiniMetrics());
+
+        setSectionChips(['Structure', 'Problem', 'Goals', 'Constraints', 'Design Thinking', 'Lo-Fi Prototype', 'Design System', 'Redesign']);
+        const ike = document.createElement('button');
+        ike.className = 'chip';
+        ike.style.cssText = 'border-color:rgba(14,165,181,.4);color:#5cc8d5;background:rgba(14,165,181,.1);';
+        ike.textContent = '↗ Internal Knowledge Engine';
+        ike.onclick = () => { send('Internal Knowledge Engine'); };
+        chipsEl.appendChild(ike);
+      }],
+    ]);
+  },
+
+  skills() {
+    q([
+      [0, () => showTyping()],
+      [850, () => {
+        hideTyping();
+        addBubble(`Here's what I work with:`, 'agent');
+      }],
+      [1300, () => addCard(tplSkills())],
+      [1700, () => addBubble(`I also hold certifications in Scaling Design Systems (Dribbble), Bloomberg Market Concepts, and BrightEdge, and a Scuba Diving International cert, which is honestly just as important to me.`, 'agent')],
+      [2500, () => setChips(['Show me your work', "What's your process?", 'Tell me about yourself'])],
+    ]);
+  },
+
+  process() {
+    q([
+      [0, () => showTyping()],
+      [850, () => {
+        hideTyping();
+        addBubble(`Research first, always. Here's the loop:`, 'agent');
+      }],
+      [1300, () => addCard(tplProcess())],
+      [1700, () => addBubble(`The non-negotiable is the last step. Tracking outcomes after shipping and bringing that data back to the next problem. A lot of designers stop there. I don't.`, 'agent')],
+      [2400, () => setChips(['Show me your work', 'Tell me about yourself', 'How do I reach you?'])],
+    ]);
+  },
+
+  experience() {
+    q([
+      [0, () => showTyping()],
+      [850, () => {
+        hideTyping();
+        addBubble(`Here's my background:`, 'agent');
+      }],
+      [1300, () => addCard(tplExperience())],
+      [1700, () => setChips(['Show me your work', 'What do you specialize in?', 'How do I reach you?'])],
+    ]);
+  },
+
+  contact() {
+    q([
+      [0, () => showTyping()],
+      [750, () => {
+        hideTyping();
+        addBubble(`Here's how to reach me:`, 'agent');
+      }],
+      [1200, () => addCard(tplContact())],
+      [1600, () => addBubble(`I respond within 48 hours and I'm always up for a conversation, especially about interesting AI design challenges.`, 'agent')],
+      [2200, () => setChips(['Show me your work', "What's your process?", 'Tell me about yourself'])],
+    ]);
+  },
+
+  availability() {
+    q([
+      [0, () => showTyping()],
+      [800, () => {
+        hideTyping();
+        addBubble(`I'm currently at Accrete AI and focused on my work there. That said, I'm always interested in conversations about great problems, even without an immediate opening.`, 'agent');
+      }],
+      [1700, () => addCard(tplContact())],
+      [2000, () => setChips(['Show me your work', "What's your process?", 'Tell me about yourself'])],
+    ]);
+  },
+
+  ai() {
+    q([
+      [0, () => showTyping()],
+      [950, () => {
+        hideTyping();
+        addBubble(`AI product design is the core of my recent work, specifically the hard UX questions that are unique to AI interfaces:`, 'agent');
+      }],
+      [1700, () => addBubble(`How do you show <strong>uncertainty</strong> without losing user confidence? How do you build <strong>trust progressively</strong>? How do you make AI reasoning <strong>legible</strong> to skeptical enterprise users who are professionally accountable for their actions?`, 'agent')],
+      [2700, () => addBubble(`The big insight from the Knowledge Engine project: users didn't mistrust the AI because it was wrong. They mistrusted it because they couldn't see why it was right. Designing for legibility changed the acceptance rate entirely.`, 'agent')],
+      [3500, () => setChips(['Tell me about the Knowledge Engine', 'Show me your work', "What's your process?"])],
+    ]);
+  },
+
+  personal() {
+    q([
+      [0, () => showTyping()],
+      [850, () => {
+        hideTyping();
+        addBubble(`A few things about me outside of work:`, 'agent');
+      }],
+      [1400, () => addBubble(`I'm a <strong>certified scuba diver</strong> (SDI TDI). There's something about being completely underwater, surrounded by near-silence, that makes the rest of the world easier to think through. I find a lot of parallels between diving and design research.`, 'agent')],
+      [2300, () => addBubble(`I also have a <strong>Bloomberg Market Concepts</strong> certification. I think great product designers need to understand the business they're designing for, not just the user.`, 'agent')],
+      [3100, () => setChips(['Show me your work', 'Tell me about yourself', 'How do I reach you?'])],
+    ]);
+  },
+
+  fallback() {
+    q([
+      [0, () => showTyping()],
+      [750, () => {
+        hideTyping();
+        addBubble(`I might not have a perfect answer for that exact phrasing. Try asking about my <strong>work</strong>, <strong>skills</strong>, <strong>process</strong>, <strong>background</strong>, or how to <strong>reach me</strong>.`, 'agent');
+        setChips(['Show me your work', 'Tell me about yourself', "What's your process?", 'How do I reach you?']);
+      }],
+    ]);
+  },
+};
+
+// ── intent routing ────────────────────────────────────────────────────────────
+
+const intents = [
+  { k:['about me','about meghan','who is','tell me about','bio','introduce','yourself','background meghan'], fn: R.about },
+  { k:['show me your work','show me her work','case studi','portfolio','projects','see your work','see her work'], fn: R.work },
+  { k:['knowledge engine','internal knowledge','itsm','accrete ai product'],              fn: R.cs1 },
+  { k:['cassini','design system','foundation first'],                                     fn: R.cs2 },
+  { k:['skill','tool','figma','framer','speciali','good at','expert','best at','what do you do','what does she do'], fn: R.skills },
+  { k:['process','how does she work','methodolog','approach','how do you','your process'], fn: R.process },
+  { k:['experience','where has she','previous','avesha','keurig','worked','history','your experience'], fn: R.experience },
+  { k:['contact','reach','email','phone','how do i','hire','get in touch','reach you'],   fn: R.contact },
+  { k:['available','open to','open roles','hiring','looking'],                            fn: R.availability },
+  { k:['ai','artificial','agent','machine learning','intelligence','llm'],                fn: R.ai },
+  { k:['scuba','personal','outside','hobby','fun fact','diving','interest'],              fn: R.personal },
+];
+
+function processInput(text) {
+  const l = text.toLowerCase().trim();
+  for (const intent of intents) {
+    if (intent.k.some(k => l.includes(k))) { intent.fn(); return; }
+  }
+  R.fallback();
+}
+
+// ── open sections directly from nav ───────────────────────────────────────────
+
+function openCS(n) {
+  msgsEl.innerHTML = '';
+  chipsEl.innerHTML = '';
+  suppressScroll = true;
+  document.getElementById('chatWrap').scrollTop = 0;
+  if (n === 1) R.cs1(); else R.cs2();
+  setTimeout(() => { suppressScroll = false; }, 1000);
+}
+
+function openAbout() {
+  msgsEl.innerHTML = '';
+  chipsEl.innerHTML = '';
+  R.about();
+}
+
+function openResume() {
+  msgsEl.innerHTML = '';
+  chipsEl.innerHTML = '';
+  q([
+    [0, () => showTyping()],
+    [900, () => {
+      hideTyping();
+      addBubble(`Here's my background, designing super cool products.`, 'agent');
+    }],
+    [1400, () => addCard(tplResume())],
+    [1900, () => addBubble(`I'm currently at <strong>Accrete AI</strong> as the founding Product Designer for ITSM, working directly with Fortune 10 clients on agent-based products.`, 'agent')],
+    [2500, () => setChips(['Internal Knowledge Engine', 'Cassini', 'Skills & tools', 'How do I reach you?'])],
+  ]);
+}
+
+function tplResume() {
+  const bullet = (text) => `<li style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:5px">${text}</li>`;
+  return `<div class="exp-card" style="max-width:950px">
+    <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px">Experience</div>
+    <div class="exp-item">
+      <div class="exp-company">Accrete AI · New York, New York</div>
+      <div class="exp-role">Product Designer II · Founding Designer for IT Service Management</div>
+      <div class="exp-meta">February 2022 – Present</div>
+      <ul style="margin:8px 0 0 16px;padding:0;list-style:disc">
+        ${bullet('Collaborates closely with Fortune 10 clients to define, design, and deliver key product features, ensuring accessibility, intuitive interaction patterns, and high usability across complex enterprise environments. Leads end-to-end design and ships products and features from 0–1.')}
+        ${bullet('Designs innovative and human-centered prototypes with intuitive user experience that directly influenced product strategy and shaped the direction of 3 major partnerships that <strong style="color:var(--text)">contributed to over $200 million dollars in business impact.</strong>')}
+        ${bullet('Leads user testing for an agent-based Knowledge Engine application and regularly synthesizes user feedback (quantitative and qualitative) to present to key stakeholders. User feedback has resulted in 30 new key product features and has steered the direction of the product.')}
+        ${bullet('Connects design initiatives with broader company goals through the development of a scalable Design System, that has led to consistency and cohesiveness across all of Accrete\'s product lines.')}
+      </ul>
+    </div>
+    <div class="exp-item">
+      <div class="exp-company">Avesha · Burlington, Massachusetts</div>
+      <div class="exp-role">Product Designer</div>
+      <div class="exp-meta">December 2021 – February 2022</div>
+      <ul style="margin:8px 0 0 16px;padding:0;list-style:disc">
+        ${bullet('Led cross-functional offshore teams of developers and designers to successfully deliver scalable, user-centered features for a Kubernetes-based application.')}
+        ${bullet('Proactively engineered a comprehensive auditing system that identified over 50 critical bugs, fostering tight collaboration with Engineering to resolve roadblocks and elevate overall product stability and user trust.')}
+      </ul>
+    </div>
+    <div class="exp-item">
+      <div class="exp-company">Keurig Dr. Pepper Snapple Inc · Burlington, Massachusetts</div>
+      <div class="exp-role">UX and Optimization, Design Engineering Co-op</div>
+      <div class="exp-meta">January 2020 – July 2020</div>
+      <ul style="margin:8px 0 0 16px;padding:0;list-style:disc">
+        ${bullet('Revised HTML across Keurig.com to improve keyword portfolio rankings, continuously monitoring and optimizing metadata for search performance.')}
+        ${bullet('Collaborated cross-functionally with Marketing, Engineering, and Design to develop and manage 150+ digital asset workflows, ensuring seamless execution and timely delivery.')}
+      </ul>
+    </div>
+    <div style="border-top:1px solid rgba(100,200,220,.1);margin:12px 0 10px;padding-top:12px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">Education</div>
+    <div class="exp-item">
+      <div class="exp-company">Northeastern University</div>
+      <div class="exp-role">Bachelor of Science in Experience Design and Business Administration</div>
+    </div>
+    <div style="border-top:1px solid rgba(100,200,220,.1);margin:12px 0 10px;padding-top:12px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">Certifications</div>
+    <div class="exp-item">
+      <div style="font-size:12px;color:var(--muted);line-height:1.9">
+        <div><strong style="color:var(--text);font-weight:500">Scaling Design Systems</strong> · Dribble</div>
+        <div><strong style="color:var(--text);font-weight:500">Bloomberg Market Concepts</strong> · Bloomberg</div>
+        <div><strong style="color:var(--text);font-weight:500">BrightEdge Professional Certification</strong> · BrightEdge</div>
+        <div><strong style="color:var(--text);font-weight:500">Scuba Diving International Certification</strong> · SDI TDI</div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(100,200,220,.1);margin:12px 0 10px;padding-top:12px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">Skills</div>
+    <div class="exp-item" style="border-bottom:none">
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">Figma Suite, Framer, User Experience, A/B Testing, User Research, Qualitative Research, Data Analysis, Design Systems, SPSS, HTML, CSS, AI Tools (Claude Code, Cursor, V0, Figma Make)</div>
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(100,200,220,.1)">
+      <a href="Kulkarni, Meghan resume .pdf" download target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#5cc8d5;text-decoration:none;padding:7px 14px;border:1px solid rgba(14,165,181,.3);border-radius:8px;background:rgba(14,165,181,.06);transition:background .2s" onmouseover="this.style.background='rgba(14,165,181,.12)'" onmouseout="this.style.background='rgba(14,165,181,.06)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Resume (PDF)
+      </a>
+    </div>
+  </div>`;
+}
+
+// ── send ──────────────────────────────────────────────────────────────────────
+
+function send(text) {
+  const v = (text || inputEl.value).trim();
+  if (!v) return;
+  inputEl.value = '';
+  addBubble(v, 'user');
+  processInput(v);
+}
+
+inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+document.getElementById('sendBtn').addEventListener('click', () => send());
+document.getElementById('resetBtn').addEventListener('click', () => {
+  msgsEl.innerHTML = '';
+  chipsEl.innerHTML = '';
+  document.getElementById('chatWrap').scrollTop = 0;
+  setTimeout(() => R.greeting(), 300);
+});
+
+// ── init ──────────────────────────────────────────────────────────────────────
+setTimeout(() => R.greeting(), 600);
+</script>
+</body>
+</html>
