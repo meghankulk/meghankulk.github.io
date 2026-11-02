@@ -81,7 +81,7 @@ html { scroll-padding-top: 104px; }
 }
 .tagline {
   color: var(--muted); font-size: clamp(19px, 1.8vw, 26px); line-height: 1.45;
-  max-width: 24em; margin: 10px 0 0;
+  max-width: 24em; margin: clamp(16px, 1.7vw, 24px) 0 0;
 }
 .sub { color: var(--muted); font-size: 16px; margin: 24px 0 36px; }
 
