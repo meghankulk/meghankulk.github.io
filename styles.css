@@ -1,0 +1,482 @@
+:root {
+  --bg: #060a24;
+  --bg-2: #0b1033;
+  --ink: #ece6d8;
+  --muted: #a3a6bc;
+  --line: rgba(236, 230, 216, 0.28);
+  --line-faint: rgba(236, 230, 216, 0.1);
+  --accent: #b4b7c9;
+  --sans: "Jost", "Futura", system-ui, sans-serif;
+  --gutter: clamp(20px, 5vw, 72px);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  /* regular weight for reading text; headings opt into the thin 300 */
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+strong { color: var(--ink); font-weight: 500; }
+.hero h1 strong { font-weight: 400; }
+.muted { color: var(--muted); }
+
+/* ---------- Nav ---------- */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 24px var(--gutter);
+  background: var(--bg);
+}
+/* Keep anchored sections clear of the solid header */
+html { scroll-padding-top: 104px; }
+.mark { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-size: 34px; line-height: 1; }
+.mark span { color: var(--accent); }
+.nav nav { display: flex; align-items: center; gap: clamp(16px, 3vw, 36px); }
+.nav nav a { font-size: 15px; color: var(--muted); transition: color .3s; }
+.nav nav a:hover { color: var(--ink); }
+.nav nav .nav-icon { display: inline-flex; padding: 2px; }
+/* the two icons sit as a tight pair after the text links */
+.nav nav .nav-icon + .nav-icon { margin-left: calc(clamp(16px, 3vw, 36px) * -0.5); }
+/* phones: the icons drop out of the header (LinkedIn is still in Contact) so the text links fit */
+@media (max-width: 600px) {
+  .nav nav .nav-icon { display: none; }
+  .nav nav { gap: 14px; }
+  .nav nav a { font-size: 14px; }
+}
+
+/* ---------- Scroll progress plane ---------- */
+.flight-progress {
+  position: fixed; right: 28px; top: 120px; bottom: 60px; width: 20px; z-index: 15;
+}
+.flight-progress .track {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 1px;
+  background: repeating-linear-gradient(var(--line) 0 4px, transparent 4px 10px);
+}
+.progress-plane {
+  position: absolute; left: 0; top: 0; width: 20px; height: 20px;
+  fill: var(--accent); pointer-events: none;
+}
+.progress-plane use {
+  transform: rotate(90deg); transition: transform .35s ease;
+}
+.progress-plane use.climbing { transform: rotate(-90deg); }
+@media (prefers-reduced-motion: reduce) { .progress-plane use { transition: none; } }
+
+/* ---------- Hero ---------- */
+.hero {
+  min-height: 100vh; min-height: 100svh;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: center;
+  padding: 120px var(--gutter) 80px;
+}
+.hero h1 {
+  font-weight: 300; color: var(--muted);
+  font-size: clamp(36px, 4.2vw, 60px); line-height: 1.1; margin: 0; letter-spacing: -0.015em;
+}
+.tagline {
+  color: var(--muted); font-size: clamp(19px, 1.8vw, 26px); line-height: 1.45;
+  max-width: 24em; margin: 10px 0 0;
+}
+.sub { color: var(--muted); font-size: 16px; margin: 24px 0 36px; }
+
+.text-link {
+  font-size: 16px; padding-bottom: 4px; border-bottom: 1px solid var(--line);
+  transition: border-color .3s;
+}
+.text-link:hover { border-color: var(--ink); }
+
+.hero-art { position: relative; margin-right: calc(var(--gutter) * -0.5); }
+.sky { width: 100%; height: auto; display: block; overflow: visible; }
+.sectors path { fill: none; stroke: var(--line-faint); stroke-width: 1; stroke-dasharray: 10 6; }
+.fixes path { fill: none; stroke: var(--line); stroke-width: 1; }
+.wx path { stroke-width: 1; stroke: rgba(236, 230, 216, 0.14); }
+.wx-outer { fill: rgba(180, 183, 201, 0.04); }
+.wx-mid { fill: rgba(180, 183, 201, 0.05); }
+.wx-core { fill: rgba(180, 183, 201, 0.07); }
+.callsign { fill: var(--muted); font-family: var(--sans); font-size: 11px; letter-spacing: 0.06em; }
+
+.route-base { fill: none; stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 7; }
+.route-trail {
+  fill: none; stroke: var(--accent); stroke-width: 1.2; stroke-linecap: round; opacity: .7;
+}
+.plane { fill: var(--ink); }
+
+/* Interactive airspace: hover a flight, click to reroute, drag the weather */
+.route-hit { fill: none; stroke: transparent; stroke-width: 18; pointer-events: stroke; cursor: pointer; }
+.flight { transition: opacity .35s ease; }
+.sky.has-focus .flight:not(.is-focus) { opacity: .3; }
+.flight.is-focus .callsign { fill: var(--ink); }
+.wx { cursor: grab; }
+.wx path { pointer-events: all; }
+.sky.dragging .wx { cursor: grabbing; }
+.wx-hint {
+  fill: var(--muted); font-family: var(--sans); font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; text-anchor: middle; pointer-events: none; transition: opacity .6s;
+}
+.wx-hint.gone { opacity: 0; }
+.sky-hit { fill: transparent; cursor: crosshair; }
+.user-fix { cursor: pointer; }
+.user-fix path { fill: var(--bg); stroke: var(--ink); stroke-width: 1.2; }
+.user-fix-hit { fill: transparent; }
+.user-fix text { fill: var(--muted); font-family: var(--sans); font-size: 10px; letter-spacing: .08em; }
+.user-fix:hover path { fill: var(--ink); }
+.user-fix .fix-remove { display: none; fill: var(--ink); }
+.user-fix:hover .fix-name { display: none; }
+.user-fix:hover .fix-remove { display: inline; }
+/* a soft ring confirms the drop */
+.fix-pulse {
+  fill: none; stroke: var(--ink); stroke-width: 1; pointer-events: none;
+  transform-box: fill-box; transform-origin: center;
+  animation: fix-pulse .7s ease-out forwards;
+}
+@keyframes fix-pulse { from { transform: scale(1); opacity: .7; } to { transform: scale(3.5); opacity: 0; } }
+/* hover preview: a ghost waypoint and the flight it will reroute */
+.fix-ghost { pointer-events: none; opacity: 0; transition: opacity .2s; }
+.fix-ghost.on { opacity: 1; }
+.fix-ghost path { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 2; }
+.fix-ghost text { fill: var(--muted); font-family: var(--sans); font-size: 10px; letter-spacing: .08em; }
+.flight.is-target .route-base { stroke: var(--ink); opacity: .7; }
+.flight.is-target .callsign { fill: var(--ink); opacity: 1 !important; }
+@media (prefers-reduced-motion: reduce) { .fix-pulse { animation: none; opacity: 0; } }
+
+/* ---------- Sections ---------- */
+.section { padding: clamp(72px, 10vw, 140px) var(--gutter); max-width: 1280px; margin: 0 auto; }
+.section h2 { font-weight: 300; font-size: clamp(32px, 4vw, 56px); margin: 0 0 40px; letter-spacing: -0.02em; line-height: 1.1; }
+/* Read by screen readers, hidden on screen */
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px !important; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Work tiles ---------- */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 28px; }
+.tile-link { display: block; }
+.cover {
+  position: relative; margin: 0; aspect-ratio: 16 / 10; overflow: hidden;
+  border-radius: 12px;
+}
+.cover img {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  object-fit: cover; object-position: top center;
+}
+/* Hover: a thin ring drawn inside the cover so the tile never shifts */
+.cover::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px #fff; opacity: 0; transition: opacity .25s ease;
+}
+.tile-link:hover .cover::after, .tile-link:focus-visible .cover::after { opacity: 1; }
+/* Covers that aren't 16:10 show whole, on a fill matching the screenshot's edge */
+.cover.fit { background: #0a0b0d; }
+.cover.fit img { object-fit: contain; object-position: center; }
+.cover.is-empty { display: grid; place-items: center; border: 1px solid var(--line-faint); }
+.cover.is-empty span { color: var(--muted); font-size: 14px; opacity: .7; }
+.tile-body { padding-top: 18px; }
+/* company label above each title, in the same data-tag lettering as the footer */
+.case-co { display: block; margin-bottom: 14px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
+.tile-co { display: block; margin-bottom: 6px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
+/* Products: one line per project, with the impact as the brightest words */
+#products .outcome { max-width: 64ch; }
+#products .tiles { gap: 72px 40px; }
+#products .outcome strong { font-weight: 500; }
+/* Tools: a lighter row of smaller cards under the main case studies */
+.tiles.tools-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 20px; }
+.tools-row .cover { border-radius: 10px; }
+.tools-row .tile-body { padding-top: 12px; }
+.tools-row .tile-head { gap: 12px; margin-bottom: 6px; }
+.tools-row .tile-body h3 { font-size: 17px; }
+.tools-row .meta { font-size: 12px; }
+.tools-row .outcome { font-size: 15px; line-height: 1.55; }
+.tile-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+.tile-body h3 { font-weight: 400; font-size: clamp(20px, 1.8vw, 24px); margin: 0; }
+.outcome { color: var(--muted); margin: 0; line-height: 1.55; max-width: 44ch; }
+.meta { flex: none; color: var(--muted); font-size: 14px; letter-spacing: 0.02em; }
+
+
+/* the break between groups is the biggest gap, so Tools reads as its own section */
+.work-group + .work-group { margin-top: clamp(80px, 9vw, 120px); }
+.group-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  padding-bottom: 14px; margin-bottom: 20px; border-bottom: 1px solid var(--line-faint);
+}
+.group-head h3 { font-weight: 400; font-size: clamp(20px, 2vw, 24px); margin: 0; }
+.group-head p { color: var(--muted); margin: 0; }
+
+/* ---------- About ---------- */
+.about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(40px, 6vw, 100px); align-items: start; }
+.bio p { font-size: clamp(18px, 1.6vw, 21px); line-height: 1.6; margin: 0 0 20px; color: var(--muted); }
+.bio strong { font-weight: 500; }
+/* the photo is a small thumbnail beside its caption, so the bio column ends level with the timeline */
+.about-photo { display: flex; align-items: center; gap: 18px; margin: 28px 0 0; }
+.about-photo img {
+  flex: none; display: block; width: 104px; aspect-ratio: 4 / 5; object-fit: cover; object-position: center top;
+  border-radius: 10px; filter: saturate(.8);
+}
+.about-photo figcaption { color: var(--muted); font-size: 15px; line-height: 1.6; }
+.history { list-style: none; margin: 0; padding: 0; }
+.history li {
+  display: grid; grid-template-columns: 120px 1fr; gap: 16px;
+  padding: 16px 0; border-top: 1px solid var(--line-faint);
+}
+.history li:last-child { border-bottom: 1px solid var(--line-faint); }
+.history span { color: var(--muted); font-size: 14px; padding-top: 3px; }
+.history strong { display: block; font-size: 18px; }
+.history small { color: var(--muted); font-size: 16px; }
+.resume-link { display: inline-block; margin-top: 24px; }
+
+/* ---------- Contact ---------- */
+.contact .email { font-size: clamp(22px, 3vw, 36px); }
+.links { list-style: none; padding: 0; margin: 36px 0 0; display: flex; gap: 28px; flex-wrap: wrap; }
+.links a { color: var(--muted); transition: color .3s; }
+.links a:hover { color: var(--ink); }
+
+/* a single quiet line to close every page */
+.site-footer { max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter) 32px; display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
+.site-footer p { margin: 0; color: var(--muted); font-size: 14px; }
+/* both ends read like a flight data tag in the hero: copyright on the left, airport code and Zulu time on the right */
+.site-footer p {
+  font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-variant-numeric: tabular-nums;
+}
+.zulu time { color: var(--ink); }
+
+
+/* ---------- Case study page ---------- */
+.case-head { max-width: 1280px; margin: 0 auto; padding: 132px var(--gutter) 0; }
+.back { display: inline-block; color: var(--muted); font-size: 15px; margin-bottom: 32px; transition: color .3s; }
+.back:hover { color: var(--ink); }
+.case-head h1 { font-weight: 300; font-size: clamp(36px, 5vw, 68px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 20px; }
+.lede { color: var(--muted); font-size: clamp(17px, 1.4vw, 20px); line-height: 1.6; margin: 0; }
+/* details on top, results below: one section, same three columns */
+/* one grid for both rows: columns size to their content and spread edge to edge,
+   so the last column sits flush with the right margin */
+.case-meta { margin: 48px 0 0; padding-top: 20px; border-top: 1px solid var(--line-faint);
+  display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 28px 24px; }
+.facts, .metrics { display: contents; }
+.case-meta dt { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+.case-meta dd { margin: 0; font-size: 18px; font-weight: 400; line-height: 1.35; }
+/* results: number first, its meaning underneath */
+.metrics > div { display: flex; flex-direction: column-reverse; justify-content: flex-end; }
+.metrics dt { margin: 2px 0 0; font-size: 14px; line-height: 1.4; }
+/* numerals sit at cap height, so nudge them up to read the same size as the words above */
+.metrics dd { font-size: 20px; line-height: 1.2; }
+
+/* every section below the header: one content width, one rhythm */
+.story, .voices, .embed, .decisions, .build, .hero-shot, .results, .reflection,
+.challenges, .solutions, .testing {
+  max-width: 1280px; margin: clamp(64px, 8vw, 104px) auto 0; padding: 0 var(--gutter);
+}
+.build, .reflection { padding-bottom: clamp(56px, 7vw, 88px); }
+.case-head + .embed, .case-head + .hero-shot { margin-top: 48px; }
+.section-title { font-weight: 400; font-size: clamp(20px, 1.8vw, 24px); margin: 0 0 20px; }
+
+/* overview and decision rows share the details row's 4-column grid:
+   title in the first column, text across the rest */
+.story-block, .decision {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;
+  padding: 20px 0 28px; border-top: 1px solid var(--line-faint);
+}
+.story-block h3, .decision h3 { font-weight: 400; font-size: 17px; line-height: 1.45; margin: 0; }
+.story-body, .decision-body { grid-column: 2 / -1; }
+.story-lead { margin: 0 0 8px; color: var(--ink); font-weight: 400; font-size: 17px; line-height: 1.45; }
+.story-body p:not(.story-lead), .decision-body p:not(.story-lead) { margin: 0; font-size: 16px; line-height: 1.65; color: var(--muted); }
+/* rows span the full width, but paragraphs stop at a comfortable line length */
+.story-body p, .decision-body p, .lede { max-width: 53ch; }
+body.case .story-body p, body.case .decision-body p { max-width: 42ch; }
+
+/* the prototype fills the screen below the nav and the page settles on it when scrolled near */
+html:has(body.case) { scroll-snap-type: y proximity; scrollbar-gutter: stable; }
+html.hold-page { overflow: hidden; }
+.embed { scroll-snap-align: start; scroll-margin-top: 84px; }
+.app-view { height: calc(100vh - 84px - 44px - 24px); max-height: 900px; }
+
+/* case study images */
+.case-figure { margin: 0; border: 1px solid var(--line-faint); border-radius: 12px; overflow: hidden; background: #0b0f2a; }
+.case-figure img { display: block; width: 100%; height: auto; }
+.hero-link { display: inline-block; margin-top: 14px; font-size: 15px; }
+.decision-figure { grid-column: 1 / -1; margin-top: 12px; width: fit-content; max-width: 100%; }
+/* never stretch a screenshot past its real size, so smaller ones stay sharp */
+.decision-figure img { width: auto; max-width: 100%; }
+.zoomable { cursor: zoom-in; }
+/* every key decision uses the same text block (title, headline, explanation) in the
+   left column; a screenshot, when there is one, sits beside it, top aligned */
+.decisions .decision :is(h3, p) { text-wrap: pretty; }
+.decisions .decision { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); grid-template-rows: auto 1fr; column-gap: 48px; row-gap: 0; align-items: start; }
+.decisions .decision h3 { grid-column: 1; grid-row: 1; margin-bottom: 10px; font-size: 20px; line-height: 1.35; }
+.decisions .decision .decision-body { grid-column: 1; grid-row: 2; }
+.decisions .decision .decision-figure { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; }
+/* a before/after pair needs the full width: text on top, both screens below */
+.decisions .decision:has(> .compare) { grid-template-columns: minmax(0, 1fr); }
+.decisions .decision > .compare { grid-column: 1; grid-row: 3; margin-top: 24px; }
+/* case study reading type: Jost runs small, so body copy is set larger with more air,
+   and title, headline and body each step down clearly */
+body.case .story-body p:not(.story-lead), body.case .decision-body p:not(.story-lead),
+body.case .ab-before, body.case .ab-after { font-size: 17.5px; line-height: 1.7; }
+body.case .story-body p:not(.story-lead), body.case .decision-body p:not(.story-lead), body.case .ab-before { color: #b6b9cd; }
+body.case .story-lead { font-size: 17.5px; line-height: 1.6; font-weight: 500; margin-bottom: 6px; }
+body.case .story-block h3, body.case .decision h3 { font-size: 19px; }
+body.case .decisions .decision h3 { font-size: 22px; line-height: 1.3; }
+body.case .section-title { font-size: clamp(26px, 2.4vw, 32px); margin-bottom: 24px; }
+/* before and after: one row per change, the old way beside the new */
+.ab-row { display: grid; grid-template-columns: 1fr 1.5fr 1.5fr; gap: 24px; padding: 20px 0 24px; border-top: 1px solid var(--line-faint); }
+.ab-row h3 { font-weight: 400; font-size: 17px; line-height: 1.45; margin: 0; }
+.ab-head { padding: 0 0 10px; border-top: 0; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ab-before, .ab-after { margin: 0; font-size: 16px; line-height: 1.6; }
+.ab-before { color: var(--muted); }
+.ab-after { color: var(--ink); }
+.ab-num { display: block; margin-bottom: 4px; font-size: 26px; line-height: 1.2; }
+.ab-figure { grid-column: 2 / -1; margin-top: 8px; }
+/* a screenshot row in the comparison: each image sits in its own column, captioned */
+.ab-shot { margin: 0; }
+.ab-shot img { display: block; width: 100%; height: auto; }
+.ab-shot figcaption { margin-top: 8px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.ab-intro { margin: 0 0 28px; }
+.ab-intro p { margin: 0; max-width: 53ch; }
+.ab-intro p + p { margin-top: 6px; color: var(--muted); }
+.viewer { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 24px; border: 0; background: transparent; overflow: auto; cursor: zoom-out; }
+.viewer::backdrop { background: rgb(4 6 20 / 0.92); }
+.viewer img { display: block; margin: auto; max-width: min(100%, 1800px); height: auto; border-radius: 8px; }
+.viewer-close { position: fixed; top: 16px; right: 20px; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; background: var(--bg); color: var(--ink); font: 300 24px/1 var(--sans); cursor: pointer; }
+
+.compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.compare figure { margin: 0; }
+/* each screen at its own proportions, tops aligned, so neither sits in an empty frame */
+.compare { align-items: start; }
+.compare.decision-figure { width: auto; }
+.compare img { width: 100%; }
+.compare figcaption { margin-top: 8px; font-size: 14px; color: var(--muted); }
+
+/* A/B results: number first, meaning underneath */
+.ab-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; margin: 14px 0 0; }
+.ab-stats > div { display: flex; flex-direction: column-reverse; justify-content: flex-end; }
+.ab-stats dd { margin: 0; font-size: 20px; line-height: 1.2; }
+.ab-stats dt { margin-top: 2px; font-size: 14px; color: var(--muted); }
+
+.placeholder-view { display: grid; place-items: center; height: auto; min-height: 360px; background: var(--bg-2); }
+.placeholder-view p { color: var(--muted); margin: 0; padding: 24px; text-align: center; }
+
+/* interview quotes: two across, on the same grid */
+.quotes {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;
+  padding-top: 24px; border-top: 1px solid var(--line-faint);
+}
+.quote { margin: 0; padding-left: 20px; border-left: 1px solid var(--line); }
+.quote blockquote {
+  margin: 0 0 14px; font-size: clamp(19px, 1.6vw, 22px); line-height: 1.45; font-weight: 300; color: var(--ink);
+}
+.quote figcaption { color: var(--muted); font-size: 14px; }
+
+.app-frame { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg-2); }
+.app-bar {
+  display: flex; align-items: center; gap: 16px; padding: 10px 16px;
+  border-bottom: 1px solid var(--line-faint); font-size: 14px;
+}
+.dots { display: flex; gap: 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-faint); }
+.url { flex: 1; text-align: center; color: var(--muted); }
+.open { color: var(--muted); white-space: nowrap; transition: color .3s; }
+.open:hover { color: var(--ink); }
+.app-view { position: relative; min-height: 480px; background: #111214; }
+.app-view iframe { width: 100%; height: 100%; border: 0; display: block; }
+.embed-note { color: var(--muted); font-size: 14px; margin: 12px 0 0; }
+.app-offline {
+  position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 4px;
+  background: var(--bg-2); padding: 24px;
+}
+.app-offline[hidden] { display: none; }
+.app-offline p { margin: 0; font-size: 18px; }
+.app-offline .muted { font-size: 15px; }
+.app-offline code { font-size: 14px; color: var(--ink); }
+
+.quotes-three { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 12px; }
+
+/* IKE: challenges as a numbered 2×2, answered by the solution grid below */
+.challenge-list {
+  list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 24px; border-top: 1px solid var(--line-faint);
+}
+.challenge-list li {
+  display: grid; grid-template-columns: 44px 1fr; padding: 20px 0 24px; border-bottom: 1px solid var(--line-faint);
+  font-size: 17px; line-height: 1.5; color: var(--ink); font-weight: 300;
+}
+.challenge-list span { color: var(--muted); font-size: 14px; padding-top: 3px; }
+.solution-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 24px; }
+.solution .case-figure { aspect-ratio: 16 / 10; }
+.solution .case-figure img { height: 100%; object-fit: cover; object-position: top left; }
+.solution-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 16px 0 6px; }
+.solution h3 { font-weight: 400; font-size: 17px; margin: 0; }
+.solves { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.solution p { margin: 0; font-size: 16px; line-height: 1.65; color: var(--muted); max-width: 52ch; }
+
+/* testing findings double as tabs for the prototype frame */
+.insight-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 8px 0 20px; }
+.insight {
+  display: flex; flex-direction: column; gap: 8px; text-align: left; font: inherit; color: var(--muted);
+  background: none; border: 0; border-top: 1px solid var(--line-faint); padding: 18px 0 4px; cursor: pointer;
+  transition: color .25s, border-color .25s;
+}
+.insight:hover { color: var(--ink); }
+.insight.is-active { border-top-color: var(--ink); color: var(--ink); }
+.insight:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+.insight-stat { font-size: 20px; line-height: 1.2; color: var(--ink); }
+.insight-stat small { font-size: 13px; color: var(--muted); margin-left: 2px; }
+.insight-title { font-size: 17px; line-height: 1.45; color: var(--ink); }
+.insight-text { font-size: 16px; line-height: 1.6; }
+.insight-link { font-size: 14px; margin-top: auto; padding-top: 6px; }
+.insight-link::after { content: " →"; }
+.insight.is-active .insight-link::after { content: " ↓"; }
+
+/* end of every case study: one quiet row carrying the reader on to the next one */
+.next-project { max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter) clamp(40px, 5vw, 56px); }
+.next-project a {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 24px;
+  padding: 20px 0; border-top: 1px solid var(--line-faint);
+}
+.next-label { color: var(--muted); font-size: 14px; }
+.next-title { font-size: 18px; color: var(--muted); transition: color .3s; }
+.next-title span { display: inline-block; margin-left: 6px; transition: transform .3s; }
+.next-project a:hover .next-title { color: var(--ink); }
+.next-project a:hover .next-title span { transform: translateX(4px); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding-top: 110px; }
+  .hero-art { order: -1; margin: 0 -10% 8px; }
+  .flight-progress { display: none; }
+  .tiles { grid-template-columns: 1fr; gap: 36px; }
+  #products .tiles { gap: 48px; }
+  .tiles.tools-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; }
+  .about-grid { grid-template-columns: 1fr; }
+  .case-meta { gap: 20px 16px; }
+  .story-block, .decision { grid-template-columns: 1fr; gap: 10px; }
+  .quotes { grid-template-columns: 1fr; gap: 28px; }
+  .compare { grid-template-columns: 1fr; }
+  .quotes-three, .challenge-list, .solution-grid, .insight-tabs { grid-template-columns: 1fr; }
+  .story-body, .decision-body, .decision-figure { grid-column: auto; }
+  .decisions .decision { grid-template-columns: 1fr; }
+  .decisions .decision .decision-figure { grid-column: 1; grid-row: 3; margin-top: 24px; }
+  .ab-row { grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+  .ab-row h3 { grid-column: 1 / -1; }
+  .ab-head span:first-child { display: none; }
+  .ab-figure { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+@media (max-width: 560px) {
+  .case-meta { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tiles.tools-row { grid-template-columns: 1fr; }
+  #products .tile-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .app-view { height: auto; min-height: 0; aspect-ratio: 16 / 10; }
+  .app-bar { gap: 12px; padding: 10px 12px; }
+  .app-bar .dots { display: none; }
+  .url { text-align: left; }
+  .open { color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+}
