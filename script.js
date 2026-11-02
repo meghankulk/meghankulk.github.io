@@ -231,10 +231,19 @@ if (reduceMotion) {
   try { hintSeen = localStorage.getItem("wxHintSeen") === "1"; } catch (e) {}
   if (hintSeen) hint.classList.add("gone");
   wxGroup.appendChild(hint);
-  skySvg.addEventListener("pointerenter", () => {
+  // It hides once the pointer actually travels across the sky, not on a pointer that is
+  // merely resting there: after the passcode screen, the cursor already sits over the sky
+  let travelled = 0, last = null;
+  const watchTravel = (e) => {
+    if (last) travelled += Math.hypot(e.clientX - last.x, e.clientY - last.y);
+    last = { x: e.clientX, y: e.clientY };
+    if (travelled < 60) return;
     hint.classList.add("gone");
     try { localStorage.setItem("wxHintSeen", "1"); } catch (e) {}
-  }, { once: true });
+    skySvg.removeEventListener("pointermove", watchTravel);
+  };
+  skySvg.addEventListener("pointermove", watchTravel);
+  skySvg.addEventListener("pointerleave", () => { last = null; });
 
   // Click open sky to drop a waypoint: the nearest flight reroutes through it.
   // Click a waypoint to remove it and send that flight back to its lane.
