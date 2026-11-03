@@ -480,3 +480,45 @@ body.case .section-title { font-size: clamp(26px, 2.4vw, 32px); margin-bottom: 2
   .url { text-align: left; }
   .open { color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
 }
+
+/* Engineered details: mono metadata, datasheet facts, numbered case-study sections */
+:root { --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace; }
+
+/* small metadata in mono caps */
+.case-co, .case-meta dt, .challenge-list span, .case-note-label, .app-bar .url, .app-bar .open, .tile-co, .site-footer p {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+}
+.back { font-family: var(--mono); font-size: 12px; letter-spacing: .02em; }
+
+/* facts as a datasheet: hairline cells, key above value */
+.facts { gap: 0; border-bottom: 1px solid var(--line-faint); }
+.facts > div { padding: 14px 16px 16px; border-left: 1px solid var(--line-faint); }
+.facts > div:first-child { border-left: 0; padding-left: 0; }
+/* numbers row uses the same columns and inset as the facts above, so values line up */
+.metrics { column-gap: 0; }
+.metrics > div { padding: 0 16px; }
+.metrics > div:first-child { padding-left: 0; }
+
+/* metrics: tabular mono numerals */
+/* JetBrains Mono digits are 0.74em tall: 17px matches Jost 18px capitals */
+.metrics dd { font-family: var(--mono); font-size: 17px; font-weight: 400; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.metrics dt { font-family: var(--sans); text-transform: none; letter-spacing: 0; font-size: 14px; }
+
+/* case studies: numbered section titles */
+main { counter-reset: sec; }
+.case .section-title { counter-increment: sec; display: flex; align-items: baseline; gap: 14px; }
+.case .section-title::before {
+  content: counter(sec, decimal-leading-zero) " /";
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--muted);
+}
+
+/* home: role lines and career years in mono, normal case */
+.tile .meta, .history li > span { font-family: var(--mono); font-size: 12px; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.callsign, .user-fix text, .fix-ghost text { font-family: var(--mono); }
+
+/* tiles: role beside the name; the name never wraps, the role line gives way instead */
+.tile-body h3 { white-space: nowrap; flex-shrink: 0; }
+.tile-head { flex-wrap: wrap; row-gap: 4px; }
+
+/* "Next project" / "Next tool" label, like the back link */
+.next-label { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
