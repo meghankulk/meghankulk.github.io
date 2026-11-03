@@ -263,7 +263,8 @@ html { scroll-padding-top: 104px; }
 /* numerals sit at cap height, so nudge them up to read the same size as the words above */
 .metrics dd { font-size: 20px; line-height: 1.2; }
 /* confidentiality note under the header facts */
-.case-note { margin: 28px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.case-note { margin: 28px 0 0; padding: 2px 0 2px 14px; border-left: 1px solid var(--line); font-size: 14px; line-height: 1.55; color: var(--muted); }
+.case-note-label { display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
 
 /* every section below the header: one content width, one rhythm */
 .story, .voices, .embed, .decisions, .build, .hero-shot, .results, .reflection,
