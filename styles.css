@@ -262,6 +262,8 @@ html { scroll-padding-top: 104px; }
 .metrics dt { margin: 2px 0 0; font-size: 14px; line-height: 1.4; }
 /* numerals sit at cap height, so nudge them up to read the same size as the words above */
 .metrics dd { font-size: 20px; line-height: 1.2; }
+/* confidentiality note under the header facts */
+.case-note { margin: 28px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
 
 /* every section below the header: one content width, one rhythm */
 .story, .voices, .embed, .decisions, .build, .hero-shot, .results, .reflection,
