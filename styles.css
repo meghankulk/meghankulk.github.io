@@ -11,7 +11,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html.smooth { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
@@ -488,7 +488,7 @@ body.case .section-title { font-size: clamp(26px, 2.4vw, 32px); margin-bottom: 2
 .case-co, .case-meta dt, .challenge-list span, .case-note-label, .app-bar .url, .app-bar .open, .tile-co, .site-footer p {
   font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
 }
-.back { font-family: var(--mono); font-size: 12px; letter-spacing: .02em; }
+.back { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 8px 0; margin-top: -8px; margin-bottom: 24px; }
 
 /* facts as a datasheet: hairline cells, key above value */
 .facts { gap: 0; border-bottom: 1px solid var(--line-faint); }

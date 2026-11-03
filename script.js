@@ -361,3 +361,6 @@ function updateProgress() {
 addEventListener("scroll", updateProgress, { passive: true });
 addEventListener("resize", updateProgress);
 updateProgress();
+
+// Smooth scrolling only after load, so arriving at /#tile jumps straight there instead of gliding from the hero
+window.addEventListener("load", () => requestAnimationFrame(() => document.documentElement.classList.add("smooth")));
